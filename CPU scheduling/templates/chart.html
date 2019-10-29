@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+  </head>
+  <body>
+    <table
+      border="1"
+      bordercolor="blue"
+      align="center"
+      boarder-collapse="collapse"
+    >
+      <tr bgcolor="skyblue">
+        {%for i in range(50)%}
+        <td>i th column</td>
+        {%endfor%}
+      </tr>
+      <tr>
+        {%for i in range(50)%}
+        <td>Second row</td>
+        {%endfor%}
+      </tr>
+    </table>
+  </body>
+</html>
