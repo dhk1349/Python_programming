@@ -5,7 +5,7 @@ Created on Fri Aug 30 11:58:21 2019
 @author: dhk13
 """
 
-class PollingService():
+class PollingService:
     """
     Polling Service
     Polling server가 excecution time과 Period를 가진다.
@@ -34,12 +34,14 @@ class PollingService():
     def PushInfo():
         return 0
 
+    def CalHyperPeriod():
+        
     def CalTask():
         for i in range(self.HyperPeriod):
 
 
         return 0
 
-class DefferableService():
+class DefferableService:
 
     def __init__():
