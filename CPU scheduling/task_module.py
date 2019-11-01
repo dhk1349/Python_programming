@@ -53,15 +53,28 @@ class PeriodicTask:
         return 0
 
 class APeriodicTask:
-    def __init__(self, exe):
+    def __init__(self, name, exe, interrupt_time):
+        self.Name=name
         self.TaskQueue=exe
+        self.InterruptTime=interrupt_time
         
     def GetRemainingTask(self):
         return self.Exetime
     
+    def GetInterruptTime(self):
+        return self.InterruptTime
+    
+    def PrintInfo(self):
+        print ("==========Executed Task==========")
+        print ("Task name: ",self.Name)
+        print("Remaining time: ",self.TaskQueue)
+        print ("=================================")
+    
+    
     def ExeTask(self, exe):
-        if (exe>0 and self.TaskQueue>0):
+        if (exe[0]>0 and self.TaskQueue>0):
             self.TaskQueue-=1
-            exe-=1
+            exe[0]-=1
+            self.PrintInfo()
             return 1
         return 0

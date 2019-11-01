@@ -41,6 +41,7 @@ class PollingService:
     Name=""
     PeriodicTasks=[]
 
+    PollServerTasks=[]
     AperiodicTasks=[]
 
     PSExeTime=1 #Polling server exetime
@@ -58,7 +59,12 @@ class PollingService:
     
     def PushAPeriodicTask(self, TaskObj):
         self.AperiodicTasks.append(TaskObj)
-        
+    
+    def Interrupter(self, time):#fnc for interruption and pushing aperiodic task
+        for i in self.AperiodicTasks:
+            if time==i.GetInterruptTime():
+                self.PollServerTasks.append(i)
+    
     def CalHyperPeriod(self):
         HyperPeriod=self.PSPeriod
         for i in range(len(self.PeriodicTasks)):
@@ -67,17 +73,18 @@ class PollingService:
         print("HyperPEriod is ",self.HyperPeriod)
         
     def PollServerTask(self):
-        PSExe=self.PSExeTime
-        for i in range(len(self.AperiodicTasks)):
-            if(self.AperiodicTasks[i].ExeTask(PSExe)==1):
+        PSExe=[self.PSExeTime]
+        for i in range(len(self.PollServerTasks)):
+            if(self.PollServerTasks[i].ExeTask(PSExe)==1):
                 print("Executed ",i,"th AP task")
-        if (PSExe==self.PSExeTime):
+        if (PSExe[0]==self.PSExeTime):
             return True
         return False
         
     def CalTask(self):
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
+            self.Interrupter(i)
             if i%self.PSPeriod==0:
                 result=self.PollServerTask()
                 i= i +self. PSExeTime-1 #Just in case Polling server exetime is bigger than 1
@@ -103,6 +110,8 @@ if __name__=="__main__":
     test1=PollingService()
     test1.PushPeriodicTask(task_module.PeriodicTask("Task A",4, 10))
     test1.PushPeriodicTask(task_module.PeriodicTask("Task B",8, 20))
+    test1.PushAPeriodicTask(task_module.APeriodicTask("APTask A", 1, 5))
+    test1.PushAPeriodicTask(task_module.APeriodicTask("APTask B", 1, 12))
     test1.CalHyperPeriod()
     test1.CalTask()
     
