@@ -27,7 +27,10 @@ class PeriodicTask:
         
     def GetRemainingTask(self):
         return self.TaskQueue
-        
+    
+    def GetExeTime(self):
+        return self.ExeTime
+    
     def GetPeriod(self):
         return self.Period
     

@@ -88,10 +88,20 @@ class PollingService:
             return True
         return False
         
-    #def Check(self):
+    def Check(self):
         #Function that checks if it's possible to schedule tasks with given info
+        left_hand=self.PSExeTime/self.PSPeriod
+        for i in self.PeriodicTasks:
+            temp=i.GetExeTime()/i.GetPeriod()
+            left_hand+=temp
+        TotalTask=(len(self.PeriodicTasks)+1)
+        right_hand=TotalTask*(2**(1/TotalTask)-1)
+        return left_hand<=right_hand
         
     def CalTask(self):
+        if (self.Check()==False):
+            print("This Task will Fail")
+            return 0
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
             self.Interrupter(i)
@@ -183,10 +193,22 @@ class DefferableService:
         tic=self.CacheDS-self.DSExeTime[0]
         self.CacheDS=self.DSExeTime[0]
         return tic
-    #def Check(self):
+    def Check(self):
         #Function that checks if it's possible to schedule tasks with given info
-        
+        left_hand=self.ConstDSExe/self.DSPeriod
+        for i in self.PeriodicTasks:
+            temp=i.GetExeTime()/i.GetPeriod()
+            left_hand+=temp
+        TotalTask=(len(self.PeriodicTasks)+1)
+        right_hand=TotalTask*(2**(1/TotalTask)-1)
+        return left_hand<=right_hand
+    
+    #def CalAvgWaitingTime():   
+    
     def CalTask(self):
+        if(self.Check()==False):
+            print("This Task will Fail")
+            return 0
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
             self.Interrupter(i)
