@@ -4,7 +4,10 @@ Created on Fri Aug 30 11:58:21 2019
 
 @author: dhk13
 """
+import importlib
 import task_module
+
+importlib.reload(task_module)
 
 def gcd(a,b):
     """Compute the greatest common divisor of a and b"""
@@ -102,6 +105,7 @@ class PollingService:
         if (self.Check()==False):
             print("This Task will Fail")
             return 0
+        print("This may not Fail")
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
             self.Interrupter(i)
@@ -160,9 +164,11 @@ class DefferableService:
         return False
     
     def CalHyperPeriod(self):
-        HyperPeriod=self.DSPeriod
+        self.HyperPeriod=self.DSPeriod
+        print(self.HyperPeriod)
         for i in range(len(self.PeriodicTasks)):
-            self.HyperPeriod=lcm(HyperPeriod, self.PeriodicTasks[i].GetPeriod())
+            print(self.PeriodicTasks[i].GetPeriod())
+            self.HyperPeriod=lcm(self.HyperPeriod, self.PeriodicTasks[i].GetPeriod())
         self.HyperPeriod=int(self.HyperPeriod)
         print("HyperPEriod is ",self.HyperPeriod)
         
@@ -186,6 +192,7 @@ class DefferableService:
         #수행할 task가 있나 확인 후, 수행할 수 있는 capacity가 존재하는지 확인.
         #수행하는게 없느면 False를 리턴할 것이다.
         #뭐라도 수행하면 True를 리턴할 것이다.
+        
         for i in range(len(self.DeferrableServerTasks)):
             while True:
                 if self.DeferrableServerTasks[i].ExeTask(self.DSExeTime)==0:
@@ -193,11 +200,15 @@ class DefferableService:
         tic=self.CacheDS-self.DSExeTime[0]
         self.CacheDS=self.DSExeTime[0]
         return tic
+    
     def Check(self):
         #Function that checks if it's possible to schedule tasks with given info
         left_hand=self.ConstDSExe/self.DSPeriod
         for i in self.PeriodicTasks:
-            temp=i.GetExeTime()/i.GetPeriod()
+            temp2=i.GetPeriod()
+            print("이건 됨 ", temp2)
+            temp=i.GetExeTime()
+            temp=temp/temp2
             left_hand+=temp
         TotalTask=(len(self.PeriodicTasks)+1)
         right_hand=TotalTask*(2**(1/TotalTask)-1)
@@ -209,6 +220,7 @@ class DefferableService:
         if(self.Check()==False):
             print("This Task will Fail")
             return 0
+        print ("This may not Fail")
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
             self.Interrupter(i)
