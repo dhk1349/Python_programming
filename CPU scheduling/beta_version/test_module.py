@@ -10,33 +10,32 @@ from imp import reload
 
 
 def harmonize():
-    lst1=[]
+    lst1=[2,4,5]
     
     return lst1
     
 if __name__=="__main__":
     print ("Test cases on test_module.py")
     
+    """
     test1=PollingService()
     test1.PushPeriodicTask(task_module.PeriodicTask("Task A",4, 10))
     test1.PushPeriodicTask(task_module.PeriodicTask("Task B",8, 20))
-    test1.PushPeriodicTask(task_module.PeriodicTask("Task C",3, 8))#내가 추가     
+    test1.PushPeriodicTask(task_module.PeriodicTask("Task C",3, 30))#내가 추가     
     test1.PushAPeriodicTask(task_module.APeriodicTask("APTask A", 1, 5))
     test1.PushAPeriodicTask(task_module.APeriodicTask("APTask B", 1, 12))
     test1.CalHyperPeriod()
     test1.CalTask()
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    test2=DefferableService()
+    test2=DeferrableService()
     test2.PushPeriodicTask(task_module.PeriodicTask("Task A",4, 10))
     test2.PushPeriodicTask(task_module.PeriodicTask("Task B",8, 20))
-    test2.PushPeriodicTask(task_module.PeriodicTask("Task C",8, 8))#내가 추가
-    test2.PushPeriodicTask(task_module.PeriodicTask("Task B",4, 6))#내가 추가
-    test2.PushPeriodicTask(task_module.PeriodicTask("Task B",4, 6))#내가 추가 
+    test2.PushPeriodicTask(task_module.PeriodicTask("Task C",3, 30))#내가 추가
     test2.PushAPeriodicTask(task_module.APeriodicTask("APTask A", 1, 5))
     test2.PushAPeriodicTask(task_module.APeriodicTask("APTask B", 1, 12))
     test2.CalHyperPeriod()
     test2.CalTask()
-    
+    """
     #harmonize 할 수 있는 RANDOM generate set 만들어서 test진행하기 
     #rule
     #Server는 우선순위 때문에 period를 가장 작게 설정해야한다.

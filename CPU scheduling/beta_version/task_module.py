@@ -42,17 +42,20 @@ class PeriodicTask:
         print("Remaining time: ",self.TaskQueue)
         print ("=================================")
     
-    def ExeTask(self, exe):
+    def ExeTask(self, exe, result=None):
         if(self.Counter%self.GetPeriod()==0):
             self.AddTask()
         
         if (exe[0]>0 and self.TaskQueue>0):
             self.TaskQueue-=1
             exe[0]-=1
-            self.PrintInfo()
+            if (result != None):
+                result=[self.Name, self.InstanceNum]
+            #self.PrintInfo()
             self.Counter+=1
             return 1
         self.Counter+=1
+        
         return 0
 
 class APeriodicTask:
@@ -67,6 +70,9 @@ class APeriodicTask:
     def GetInterruptTime(self):
         return self.InterruptTime
     
+    def GetName(self):
+        return self.Name
+    
     def PrintInfo(self):
         print ("==========Executed Task==========")
         print ("Task name: ",self.Name)
@@ -79,6 +85,6 @@ class APeriodicTask:
             self.TaskQueue-=1
             #왜 빼기 1을 하지? 이 부분이 이상해 . 1말고 capacity만큼빼줘야해.
             exe[0]-=1
-            self.PrintInfo()
+            #self.PrintInfo()
             return 1
         return 0
