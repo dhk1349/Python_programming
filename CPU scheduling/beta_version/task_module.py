@@ -51,7 +51,7 @@ class PeriodicTask:
             exe[0]-=1
             if (result != None):
                 result=[self.Name, self.InstanceNum]
-            #self.PrintInfo()
+            self.PrintInfo()
             self.Counter+=1
             return 1
         self.Counter+=1
@@ -85,6 +85,6 @@ class APeriodicTask:
             self.TaskQueue-=1
             #왜 빼기 1을 하지? 이 부분이 이상해 . 1말고 capacity만큼빼줘야해.
             exe[0]-=1
-            #self.PrintInfo()
+            self.PrintInfo()
             return 1
         return 0

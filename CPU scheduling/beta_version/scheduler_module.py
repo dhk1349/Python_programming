@@ -6,6 +6,8 @@ Created on Fri Aug 30 11:58:21 2019
 """
 import importlib
 import task_module
+import random
+import math
 
 importlib.reload(task_module)
 
@@ -56,7 +58,11 @@ class PollingService:
     
     def __init__(self):
         self.Name="Polling Service"
-
+    
+    def SetServer(self, inputlst):
+        self.PSExeTime=inputlst[0]
+        self.PSPeriod=inputlst[1]
+        
     def PushPeriodicTask(self,TaskObj):
         self.PeriodicTasks.append(TaskObj)
         self.PeriodicTasks.sort(key=lambda object:object.GetPeriod())
@@ -154,6 +160,10 @@ class DeferrableService:
     def __init__(self):
         self.name="DifferableService"
     
+    def SetServer(self, inputlst):
+        self.ConstDSExe=inputlst[0]
+        self.DSPeriod=inputlst[1]
+    
     def PushPeriodicTask(self,TaskObj):
         self.PeriodicTasks.append(TaskObj)
         self.PeriodicTasks.sort(key=lambda object:object.GetPeriod())
@@ -176,7 +186,7 @@ class DeferrableService:
             self.HyperPeriod=lcm(self.HyperPeriod, self.PeriodicTasks[i].GetPeriod())
         self.HyperPeriod=int(self.HyperPeriod)
         self.ResultList=[0]*self.HyperPeriod
-        #print("HyperPEriod is ",self.HyperPeriod)
+        print("HyperPEriod is ",self.HyperPeriod)
 
     def InitializeServer(self):
         self.DSExeTime[0]=self.ConstDSExe
@@ -208,7 +218,7 @@ class DeferrableService:
     
     def CalTask(self):
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
-            #print("Time ",i)
+            print("Time ",i)
             self.Interrupter(i)
             if i%self.DSPeriod==0:#해당 if 문은 필요하 없다. interrrupt가 리턴하는 값으로 조건 변경
                self.InitializeServer()
@@ -255,12 +265,74 @@ def CalAveWaitingTime(resultlist):
         #print("appending", total)
         waitlist.append(total)
     #print (waitlist, len(waitlist))
-    result=sum(waitlist)*1.0/len(waitlist)*1.0
+    #result=sum(waitlist)*1.0/len(waitlist)*1.0
     #print("acg wait time ", result)
     #print (tasklist)
-    return result
+    #print(waitlist)
+    return waitlist
+
+def HarmonizedInputGenerator():
+    DivisorSet=[[3, 5], [2, 2, 5], [2, 3, 5]]
+    
+    SelectLCM=random.randrange(0,3)
+    SelectLCM=DivisorSet[SelectLCM]
+    
+    Task=random.randrange(2,5)
+    Period=[0]*Task
+    Task=[0]*Task
+    
+    #
+    for i in range(len(Task)):
+        temp=[0]*len(SelectLCM)
+        for j in range(len(SelectLCM)):
+            temp[j]=random.randrange(0,2)
+        Task[i]=temp
+    
+    for i in range(len(Period)):
+        temp=1
+        for j in range(len(Task[i])):
+            if Task[i][j]==1:
+                temp*=SelectLCM[j]
+        if temp==1:
+            temp*=SelectLCM[0]
+        Period[i]=temp
+    
+    Task=[0]*len(Period)
+    for i in range(len(Period)):
+        Task[i]=random.randrange(3, int(math.floor(2**Period[i])))
+        Task[i]=(Period[i]-math.floor(math.log(Task[i] ,2)))
+    
+    AP=min(Period)
+    APIndex=Period.index(AP)
+    Server=[Task[APIndex], Period[APIndex]]
+    Task.remove(Task[APIndex])
+    Period.remove(Period[APIndex])
+    
+    for i in range(len(Task)):
+        Task[i]=[Task[i],Period[i]]
+        
+    #print (Task) #Regular tasks
+    #print (Server) #server spec
+    
+    APTask=[-1]*random.randrange(1,4)
+    LCM=1
+    for i in SelectLCM:
+        LCM*=i
+    for i in range(len(APTask)):
+        temp=random.randrange(0,LCM)
+        #if APTask.count(temp)>0:
+            
+        #else:
+        APTask[i]=temp
+    for i in range(len(APTask)):
+        APTask[i]=[1, APTask[i]]
+    #print (APTask)
+    #[server, Task, APTask]
+    print ([Server, Task, APTask])
+    return [Server, Task, APTask]
 
 def module(inputlist):
+        
     if inputlist[0]=="PollingService":
         obj=PollingService()
         #print("Polling")
@@ -270,13 +342,16 @@ def module(inputlist):
     else:
         #print("None")
         return 0
-    for i in range(len(inputlist[1])):
-        obj.PushPeriodicTask(task_module.PeriodicTask("Task "+str(i+1),inputlist[1][i][0], inputlist[1][i][1]))
+    obj.SetServer(inputlist[1])
+    
     for i in range(len(inputlist[2])):
-        obj.PushAPeriodicTask(task_module.APeriodicTask("APTask "+str(i+1), inputlist[2][i][0], inputlist[2][i][1]))
+        obj.PushPeriodicTask(task_module.PeriodicTask("Task "+str(i+1),inputlist[2][i][0], inputlist[2][i][1]))
+    for i in range(len(inputlist[3])):
+        obj.PushAPeriodicTask(task_module.APeriodicTask("APTask "+str(i+1), inputlist[3][i][0], inputlist[3][i][1]))
     obj.CalHyperPeriod()
     AvgWaitTime=CalAveWaitingTime(obj.CalTask())
     return AvgWaitTime
+
 
 if __name__=="__main__":
     print("Test Execution on scheduler_module.py")
@@ -304,5 +379,9 @@ if __name__=="__main__":
     #결과 값으로 avg wait time을 계산해주낟.
     #더 구현해야할 것이. aptask와 ptask를 동시에 리턴하는 변수를 아직 안만들었다.
     #그리고 flask와 연결해야함.
-    module(lst1)    
+    
+    #module(lst1)    
+    list3=HarmonizedInputGenerator()
+    list3.insert(0, "DeferrableService")
+    module(list3)
     
