@@ -24,21 +24,16 @@
       </tr>
     </table>
     <table border = 1>
+         {% for key, value in result.items() %}
+
             <tr>
-               <th> Scheduler  </th>
-               <td> {{g.input[0] }} </td>
+               <th> {{ key }} </th>
+               <td> {{ value }} </td>
             </tr>
-            <tr>
-               <th> Periodic Task  </th>
-               <td> {{g.input[2] }} </td>
-            </tr>
-            <tr>
-               <th> Aperiodic Task </th>
-               <td> {{g.input[3]}} </td>
-            </tr>
+
+         {% endfor %}
       </table>
       <p>Avg Waiting time: {{g.result}}</p>
       <p>Input: {{g.input}}</p>
-      <p>{{g.TotalResult}}</p>
   </body>
 </html>
