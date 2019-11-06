@@ -93,12 +93,20 @@ class PollingService:
         time=puttimehere
         for i in range(len(self.PollServerTasks)):
             while True:
+                """
                 a=self.PollServerTasks[i].ExeTask(exe=PSExe, Totallist=self.TotalResult, time=time)
                 if a==0:
                     break
                 elif a==1:
                     self.ResultList[time]=[self.PollServerTasks[i].GetName(), self.PollServerTasks[i].GetInterruptTime()]
                     time+=1
+                """
+                if(self.PollServerTasks[i].ExeTask(exe=PSExe)==1):
+                    self.TotalResult[puttimehere]=[self.PollServerTasks[i].GetName(), self.PollServerTasks[i].GetInterruptTime()]
+                    self.ResultList[puttimehere]=[self.PollServerTasks[i].GetName(), self.PollServerTasks[i].GetInterruptTime()]
+                    time+=1
+                else:
+                    break
         if (PSExe[0]==self.PSExeTime):
             return True
         return False
@@ -113,7 +121,8 @@ class PollingService:
                 time=[1]
                 for j in range(len(self.PeriodicTasks)):
                     if result==True:
-                        self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)
+                        if(self.PeriodicTasks[j].ExeTask(exe=time)==1):
+                            self.TotalResult[i]=[self.PeriodicTasks[j].GetName(), self.PeriodicTasks[j].GetInstanceNum()]    
                         """
                         if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)==1):
                             print("Executed ",j,"th Periodic task.\n\n")
@@ -121,10 +130,10 @@ class PollingService:
                     else:
                         self.PeriodicTasks[j].AddCount()
             else:
-                print("no polling period")
                 time=[1]
                 for j in range(len(self.PeriodicTasks)):
-                    if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)==1):
+                    if(self.PeriodicTasks[j].ExeTask(exe=time)==1):
+                        self.TotalResult[i]=[self.PeriodicTasks[j].GetName(), self.PeriodicTasks[j].GetInstanceNum()]
                         print("Executed ",j,"th Periodic task\n\n")
         print (self.TotalResult)
         return self.ResultList, self.TotalResult, self.HyperPeriod
@@ -417,6 +426,6 @@ if __name__=="__main__":
     
     #module(lst1)    
     list3=InputGenerator()
-    list3.insert(0, "DeferrableService")
+    list3.insert(0, "PollingService")
     module(list3)
     

@@ -12,12 +12,15 @@ class PeriodicTask:
         self.Name=name
         self.ExeTime=exe
         self.Period=period
-        self.TaskQueue=0
+        self.TaskQueue=exe
         self.Counter=0
-        self.InstanceNum=0
+        self.InstanceNum=1
     
     def AddCount(self):
         self.Counter+=1
+        if(self.Counter%self.GetPeriod()==0):
+            self.AddTask()
+
     
     def AddTask(self):
         self.TaskQueue+=self.ExeTime
@@ -48,9 +51,6 @@ class PeriodicTask:
         print ("=================================")
     
     def ExeTask(self, exe, result=None, Totallist=None, time=None):
-        if(self.Counter%self.GetPeriod()==0):
-            self.AddTask()
-        
         if (exe[0]>0 and self.TaskQueue>0):
             self.TaskQueue-=1
             exe[0]-=1
@@ -64,8 +64,8 @@ class PeriodicTask:
             self.PrintInfo()
             self.Counter+=1
             return 1
-        self.Counter+=1
-        
+        #self.Counter+=1
+        self.AddCount()
         return 0
 
 class APeriodicTask:
