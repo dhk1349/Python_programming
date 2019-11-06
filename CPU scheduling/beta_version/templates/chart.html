@@ -12,46 +12,53 @@
       align="center"
       boarder-collapse="collapse"
     >
-      <tr bgcolor="skyblue">
-        {%for i in range(50)%}
-        <td>i th column</td>
+      <tr bgcolor="skyblue" >
+        <td style="width:200px;">Time</td>
+        {%for i in range(TotalResult|length)%}
+        <td style="width:200px;">{{i}}</td>
         {%endfor%}
       </tr>
-      <tr>
-        {%for i in range(50)%}
-        <td>Second row</td>
+      <tr  >
+        <td style="width:200px;">Task/Instance#</td>
+        {%for i in TotalResult%}
+        <td style="width: 200px;">{{i[0]}}<br>{{i[1]}}</td>
         {%endfor%}
       </tr>
     </table>
     <table border = 1>
             <tr>
                <th> Scheduler  </th>
-               <td> {{g.input[0] }} </td>
+               <td> {{inputlist[0] }} </td>
             </tr>
             <tr>
                <th> Server ExeTime </th>
-               <td> {{g.input[1][0]}} </td>
+               <td> {{inputlist[1][0]}} </td>
             </tr>
             <tr>
                <th> Server Period </th>
-               <td> {{g.input[1][1]}} </td>
+               <td> {{inputlist[1][1]}} </td>
             </tr>
             <tr>
                <th> Periodic Task  </th>
-               <td> {{g.input[2] }} </td>
+               <td> {{inputlist[2] }} </td>
             </tr>
             <tr>
                <th> Aperiodic Task </th>
-               <td> {{g.input[3]}} </td>
+               <td> {{inputlist[3]}} </td>
             </tr>
             <tr>
                <th> HyperPeriod </th>
-               <td> {{g.HP}} </td>
+               <td> {{HP}} </td>
             </tr>
       </table>
-      <p>Avg Waiting time: {{g.AvgWaitTime[0]/g.AvgWaitTime[1]}}</p>
-      <p>Total Waiting Time: {{g.AvgWaitTime[0]}}<br>Total Aptask Done: {{g.AvgWaitTime[1]}}</p>
-      <p>Input: {{g.input}}</p>
-      <p>{{g.TotalResult}}</p>
+      <p>Avg Waiting time: {{AvgWaitTime[0]/AvgWaitTime[1]}}</p>
+      <p>Total Waiting Time: {{AvgWaitTime[0]}}<br>Total Aptask Done: {{AvgWaitTime[1]}}</p>
+      <p>Input: {{inputlist}}</p>
+      <p>{{TotalResult}}</p>
+      <form action="http://localhost:1080/" >
+        <button type="submit" value="submit">
+          Return
+        </button>
+      </form>
   </body>
 </html>

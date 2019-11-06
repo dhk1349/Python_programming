@@ -10,20 +10,16 @@ from scheduler_module import module, InputGenerator
 app=Flask(__name__)
 @app.route('/')
 def index_page():
-	#info=request.form['data']
-	return render_template("index.html")
+    return render_template("index.html")
 
 @app.route('/chart', methods=['POST', 'GET'])
 def chart():
     if request.method == 'POST':
       result = request.form
-      #lst1=["DeferrableService", [[4,10],[8,20]],[[2,5],[1,12]]]
-      #result1=module(lst1)
       list3=InputGenerator()
       list3.insert(0, result['Scheduler'])
-      g.input=list3
-      g.AvgWaitTime, g.TotalResult, g.HP = module(list3)
-      return render_template("chart.html",result = result)
+      AvgWaitTime, TotalResult, HP = module(list3)
+      return render_template("chart.html",result = result, inputlist=list3, AvgWaitTime=AvgWaitTime, TotalResult=TotalResult, HP=HP)
 
 if __name__=="__main__":
     app.run(host="0.0.0.0", port=1080, debug=True)
