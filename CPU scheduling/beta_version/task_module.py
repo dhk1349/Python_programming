@@ -58,9 +58,6 @@ class PeriodicTask:
                 result=[self.Name, self.InstanceNum]
             #if (Totallist!=None):
             #    Totallist[self.Counter]=self.Name
-            if (Totallist != None and time!=None):
-                print(time,"번 째 인덱스에 넣을거임!")
-                Totallist[self.Counter]=[self.Name, self.InstanceNum]
             self.PrintInfo()
             self.Counter+=1
             return 1
@@ -93,13 +90,9 @@ class APeriodicTask:
     def ExeTask(self, exe, Totallist=None, time=None):
         if (exe[0]>0 and self.TaskQueue>0):
             self.TaskQueue-=1
-            #왜 빼기 1을 하지? 이 부분이 이상해 . 1말고 capacity만큼빼줘야해.
             exe[0]-=1
             #if (Totallist != None):
             #    Totallist=self.GetName()
-            if (Totallist!=None and time!=None):
-                print(time,"번 째 인덱스에 넣을거임!")
-                Totallist[time]=[self.Name, self.InterruptTime]
             self.PrintInfo()
             return 1
         return 0

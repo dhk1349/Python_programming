@@ -51,7 +51,11 @@
                <td> {{HP}} </td>
             </tr>
       </table>
+      {%if AvgWaitTime[1]==0 %}
+      <p>Avg Waiting time: 0</p>
+      {%else%}
       <p>Avg Waiting time: {{AvgWaitTime[0]/AvgWaitTime[1]}}</p>
+      {%endif%}
       <p>Total Waiting Time: {{AvgWaitTime[0]}}<br>Total Aptask Done: {{AvgWaitTime[1]}}</p>
       <p>Input: {{inputlist}}</p>
       <p>{{TotalResult}}</p>

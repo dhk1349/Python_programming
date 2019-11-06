@@ -90,43 +90,36 @@ class PollingService:
         
     def PollServerTask(self, puttimehere):      
         PSExe=[self.PSExeTime]
-        time=puttimehere
+        time=-1
         for i in range(len(self.PollServerTasks)):
             while True:
-                """
-                a=self.PollServerTasks[i].ExeTask(exe=PSExe, Totallist=self.TotalResult, time=time)
-                if a==0:
-                    break
-                elif a==1:
-                    self.ResultList[time]=[self.PollServerTasks[i].GetName(), self.PollServerTasks[i].GetInterruptTime()]
-                    time+=1
-                """
                 if(self.PollServerTasks[i].ExeTask(exe=PSExe)==1):
                     self.TotalResult[puttimehere]=[self.PollServerTasks[i].GetName(), self.PollServerTasks[i].GetInterruptTime()]
                     self.ResultList[puttimehere]=[self.PollServerTasks[i].GetName(), self.PollServerTasks[i].GetInterruptTime()]
                     time+=1
                 else:
                     break
-        if (PSExe[0]==self.PSExeTime):
-            return True
-        return False
+        return time
         
     def CalTask(self):
+        passcounter=0
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
+            if passcounter>=1:
+                passcounter-=1
+                for j in range(len(self.PeriodicTasks)):
+                    self.PeriodicTasks[j].AddCount()
+                continue
+            
             self.Interrupter(i)
             if i%self.PSPeriod==0:
-                result=self.PollServerTask(i)
+                passcounter=self.PollServerTask(i)
                 i= i +self. PSExeTime-1 #Just in case Polling server exetime is bigger than 1
                 time=[1]
                 for j in range(len(self.PeriodicTasks)):
-                    if result==True:
+                    if passcounter==-1:
                         if(self.PeriodicTasks[j].ExeTask(exe=time)==1):
                             self.TotalResult[i]=[self.PeriodicTasks[j].GetName(), self.PeriodicTasks[j].GetInstanceNum()]    
-                        """
-                        if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)==1):
-                            print("Executed ",j,"th Periodic task.\n\n")
-                        """
                     else:
                         self.PeriodicTasks[j].AddCount()
             else:
@@ -134,8 +127,8 @@ class PollingService:
                 for j in range(len(self.PeriodicTasks)):
                     if(self.PeriodicTasks[j].ExeTask(exe=time)==1):
                         self.TotalResult[i]=[self.PeriodicTasks[j].GetName(), self.PeriodicTasks[j].GetInstanceNum()]
-                        print("Executed ",j,"th Periodic task\n\n")
-        print (self.TotalResult)
+            print()
+        #print (self.TotalResult)
         return self.ResultList, self.TotalResult, self.HyperPeriod
             
 class DeferrableService:
@@ -196,19 +189,6 @@ class DeferrableService:
         self.CacheDS=self.ConstDSExe
     
     def DeferrableTask(self, puttimehere):
-        """
-        time=puttimehere
-        for i in range(len(self.DeferrableServerTasks)):
-            while True:
-                if self.DeferrableServerTasks[i].ExeTask(exe=self.DSExeTime, Totallist=self.TotalResult, time=time)==0:
-                    break
-                else:
-                    self.ResultList[time]=[self.DeferrableServerTasks[i].GetName(), self.DeferrableServerTasks[i].GetInterruptTime()]
-                    time+=1
-        tic=self.CacheDS-self.DSExeTime[0]
-        self.CacheDS=self.DSExeTime[0]
-        return tic
-        """
         for i in range(len(self.DeferrableServerTasks)):
             if(self.DeferrableServerTasks[i].ExeTask(exe=self.DSExeTime)==1):
                 self.TotalResult[puttimehere]=[self.DeferrableServerTasks[i].GetName(), self.DeferrableServerTasks[i].GetInterruptTime()]
@@ -220,27 +200,19 @@ class DeferrableService:
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
             self.Interrupter(i)
-            if i%self.DSPeriod==0:#해당 if 문은 필요하 없다. interrrupt가 리턴하는 값으로 조건 변경
+            if i%self.DSPeriod==0:
                self.InitializeServer()
-                #이부분이 달라져야한다. 
-                #interrupt 들어올 때마다
             tic=self.DeferrableTask(i)
             if (tic==0):#if Defferable server did nothing
                 time=[1]
                 for j in range(len(self.PeriodicTasks)):
                     if(self.PeriodicTasks[j].ExeTask(exe=time)==1):
                         self.TotalResult[i]=[self.PeriodicTasks[j].GetName(), self.PeriodicTasks[j].GetInstanceNum()]
-                    """
-                    if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)==1):
-                        continue
-
-                        #print("Executed ",j,"th Periodic task\n\n")
-                    """
             else: #if server did sth
                 for k in range(len(self.PeriodicTasks)):
                     self.PeriodicTasks[k].AddCount()
-                        
-        print (self.TotalResult)
+            print()
+        #print (self.TotalResult)
         return self.ResultList, self.TotalResult, self.HyperPeriod
 
 def CalAveWaitingTime(resultlist):
@@ -277,9 +249,10 @@ def CalAveWaitingTime(resultlist):
     #print (tasklist)
     if len(waitlist)!=0:
         AvgWaitingTime=sum(waitlist)/len(waitlist)
+        waitlist=[sum(waitlist), len(waitlist)]
     else:
-            AvgWaitingTime=0
-    waitlist=[sum(waitlist), len(waitlist)]
+        AvgWaitingTime=0
+        waitlist=[sum(waitlist), len(waitlist)]
     print("Average Waiting Time: ", AvgWaitingTime)
     return waitlist
 
@@ -416,16 +389,16 @@ if __name__=="__main__":
     test1.CalHyperPeriod()
     test1.CalTask()
     """
-    lst1=["DeferrableService", [[4,10],[8,20]],[[1,5],[1,12]]]
-    lst2=["PollingService", [[4,10],[8,20]],[[1,5],[1,12]]]
-    #현재 상황
-    #input을 위처럼 리스트로 만들어 주면
-    #결과 값으로 avg wait time을 계산해주낟.
-    #더 구현해야할 것이. aptask와 ptask를 동시에 리턴하는 변수를 아직 안만들었다.
-    #그리고 flask와 연결해야함.
-    
-    #module(lst1)    
+    print("##########################PollingService##########################")    
     list3=InputGenerator()
     list3.insert(0, "PollingService")
     module(list3)
+    print("##################################################################\n") 
+      
+    print("########################DeferrableService########################") 
+    list3=InputGenerator()
+    list3.insert(0, "DeferrableService")
+    module(list3)
+    print("#################################################################\n")
+    input("Press enter to continue...")
     
