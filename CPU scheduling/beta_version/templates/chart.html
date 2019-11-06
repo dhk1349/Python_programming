@@ -29,6 +29,14 @@
                <td> {{g.input[0] }} </td>
             </tr>
             <tr>
+               <th> Server ExeTime </th>
+               <td> {{g.input[1][0]}} </td>
+            </tr>
+            <tr>
+               <th> Server Period </th>
+               <td> {{g.input[1][1]}} </td>
+            </tr>
+            <tr>
                <th> Periodic Task  </th>
                <td> {{g.input[2] }} </td>
             </tr>
@@ -36,8 +44,13 @@
                <th> Aperiodic Task </th>
                <td> {{g.input[3]}} </td>
             </tr>
+            <tr>
+               <th> HyperPeriod </th>
+               <td> {{g.HP}} </td>
+            </tr>
       </table>
-      <p>Avg Waiting time: {{g.result}}</p>
+      <p>Avg Waiting time: {{g.AvgWaitTime[0]/g.AvgWaitTime[1]}}</p>
+      <p>Total Waiting Time: {{g.AvgWaitTime[0]}}<br>Total Aptask Done: {{g.AvgWaitTime[1]}}</p>
       <p>Input: {{g.input}}</p>
       <p>{{g.TotalResult}}</p>
   </body>

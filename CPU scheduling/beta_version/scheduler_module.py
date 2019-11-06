@@ -66,7 +66,7 @@ class PollingService:
     def PushPeriodicTask(self,TaskObj):
         self.PeriodicTasks.append(TaskObj)
         self.PeriodicTasks.sort(key=lambda object:object.GetPeriod())
-        print (self.PeriodicTasks)
+        #print (self.PeriodicTasks)
     
     def PushAPeriodicTask(self, TaskObj):
         self.AperiodicTasks.append(TaskObj)
@@ -81,7 +81,7 @@ class PollingService:
         self.HyperPeriod=self.PSPeriod
         for i in range(len(self.PeriodicTasks)):
             #print(,"",)
-            print(self.PeriodicTasks[i].GetPeriod())
+            #print(self.PeriodicTasks[i].GetPeriod())
             self.HyperPeriod=lcm(self.HyperPeriod, self.PeriodicTasks[i].GetPeriod())
         self.HyperPeriod=int(self.HyperPeriod)
         self.ResultList=[0]*self.HyperPeriod
@@ -93,7 +93,7 @@ class PollingService:
         time=puttimehere
         for i in range(len(self.PollServerTasks)):
             while True:
-                a=self.PollServerTasks[i].ExeTask(exe=PSExe, Totallist=self.TotalResult[time])
+                a=self.PollServerTasks[i].ExeTask(exe=PSExe, Totallist=self.TotalResult, time=time)
                 if a==0:
                     break
                 elif a==1:
@@ -113,17 +113,21 @@ class PollingService:
                 time=[1]
                 for j in range(len(self.PeriodicTasks)):
                     if result==True:
-                        if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult)==1):
+                        self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)
+                        """
+                        if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)==1):
                             print("Executed ",j,"th Periodic task.\n\n")
+                        """
                     else:
                         self.PeriodicTasks[j].AddCount()
             else:
+                print("no polling period")
                 time=[1]
                 for j in range(len(self.PeriodicTasks)):
-                    if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult)==1):
+                    if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)==1):
                         print("Executed ",j,"th Periodic task\n\n")
-        print (self.ResultList)
-        return self.ResultList, self.TotalResult
+        print (self.TotalResult)
+        return self.ResultList, self.TotalResult, self.HyperPeriod
             
 class DeferrableService:
     """
@@ -161,11 +165,12 @@ class DeferrableService:
         self.AperiodicTasks.append(TaskObj)
     
     def Interrupter(self, time):#fnc for interruption and pushing aperiodic task
+        value=False
         for i in self.AperiodicTasks:
             if time==i.GetInterruptTime():
                 self.DeferrableServerTasks.append(i)
-                return True
-        return False
+                value=True
+        return value
     
     def CalHyperPeriod(self):
         self.HyperPeriod=self.DSPeriod
@@ -182,10 +187,11 @@ class DeferrableService:
         self.CacheDS=self.ConstDSExe
     
     def DeferrableTask(self, puttimehere):
+        """
         time=puttimehere
         for i in range(len(self.DeferrableServerTasks)):
             while True:
-                if self.DeferrableServerTasks[i].ExeTask(exe=self.DSExeTime, Totallist=self.TotalResult[time])==0:
+                if self.DeferrableServerTasks[i].ExeTask(exe=self.DSExeTime, Totallist=self.TotalResult, time=time)==0:
                     break
                 else:
                     self.ResultList[time]=[self.DeferrableServerTasks[i].GetName(), self.DeferrableServerTasks[i].GetInterruptTime()]
@@ -193,6 +199,13 @@ class DeferrableService:
         tic=self.CacheDS-self.DSExeTime[0]
         self.CacheDS=self.DSExeTime[0]
         return tic
+        """
+        for i in range(len(self.DeferrableServerTasks)):
+            if(self.DeferrableServerTasks[i].ExeTask(exe=self.DSExeTime)==1):
+                self.TotalResult[puttimehere]=[self.DeferrableServerTasks[i].GetName(), self.DeferrableServerTasks[i].GetInterruptTime()]
+                self.ResultList[puttimehere]=[self.DeferrableServerTasks[i].GetName(), self.DeferrableServerTasks[i].GetInterruptTime()]
+                return 1
+        return 0        
     
     def CalTask(self):
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
@@ -206,16 +219,20 @@ class DeferrableService:
             if (tic==0):#if Defferable server did nothing
                 time=[1]
                 for j in range(len(self.PeriodicTasks)):
-                    if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult)==1):
+                    if(self.PeriodicTasks[j].ExeTask(exe=time)==1):
+                        self.TotalResult[i]=[self.PeriodicTasks[j].GetName(), self.PeriodicTasks[j].GetInstanceNum()]
+                    """
+                    if(self.PeriodicTasks[j].ExeTask(exe=time, Totallist=self.TotalResult, time=i)==1):
                         continue
+
                         #print("Executed ",j,"th Periodic task\n\n")
+                    """
             else: #if server did sth
-                i+=tic
-                for j in range(tic):
-                    for k in range(len(self.PeriodicTasks)):
-                        self.PeriodicTasks[k].AddCount()
-        #print (self.ResultList)
-        return self.ResultList, self.TotalResult
+                for k in range(len(self.PeriodicTasks)):
+                    self.PeriodicTasks[k].AddCount()
+                        
+        print (self.TotalResult)
+        return self.ResultList, self.TotalResult, self.HyperPeriod
 
 def CalAveWaitingTime(resultlist):
     tasklist=dict()
@@ -229,11 +246,9 @@ def CalAveWaitingTime(resultlist):
                     tasklist[resultlist[i][0]]=[resultlist[i][1], i]
             else:#뭔가 있음 
                 #print(tasklist.get(resultlist[i][0]), "여기다가 추가할 거", tasklist.get(resultlist[i][0]).append(i))
-                print ("else로 들어왔다는 말 ")
                 temp=tasklist.get(resultlist[i][0])
                 temp.append(i)
                 tasklist[resultlist[i][0]]=temp
-    print("***", tasklist)
     for i in list(tasklist.values()):
         total=0
         if len(i)==1:
@@ -247,12 +262,17 @@ def CalAveWaitingTime(resultlist):
                 total=total+(i[j]-i[j-1])
         #print("appending", total)
         waitlist.append(total)
-    print("Wait lsit" , waitlist)
+    #print("Wait lsit" , waitlist)
     #result=sum(waitlist)*1.0/len(waitlist)*1.0
     #print("acg wait time ", result)
     #print (tasklist)
+    if len(waitlist)!=0:
+        AvgWaitingTime=sum(waitlist)/len(waitlist)
+    else:
+            AvgWaitingTime=0
     waitlist=[sum(waitlist), len(waitlist)]
-    return waitlist[0]/waitlist[1]
+    print("Average Waiting Time: ", AvgWaitingTime)
+    return waitlist
 
 def HarmonizedInputGenerator():
     DivisorSet=[[3, 5], [2, 2, 5], [2, 3, 5]]
@@ -293,7 +313,7 @@ def HarmonizedInputGenerator():
     
     for i in range(len(Task)):
         Task[i]=[Task[i],Period[i]]
-        
+
     #print (Task) #Regular tasks
     #print (Server) #server spec
     
@@ -330,7 +350,9 @@ def check(inputlist):
     left_hand=inputlist[0][0]/inputlist[0][1]
     for i in inputlist[1]:
         left_hand+=(i[0]/i[1])
-    right_hand=len(inputlist[1])*(2**(1/len(inputlist[1]))-1)
+    right_hand=(len(inputlist[1])+1)*(2**(1/(len(inputlist[1])+1))-1)
+    #print("left", left_hand)
+    #print("right", right_hand)
     return left_hand<=right_hand
 
 def InputGenerator():
@@ -338,7 +360,10 @@ def InputGenerator():
         inputlist=HarmonizedInputGenerator()
         if(check(inputlist)):
             break
-    print ("inputlist is ", inputlist)
+    #print ("inputlist is ", inputlist)
+    print("Server ExeTime/Period: ", inputlist[0][0],"/",inputlist[0][1])
+    print("Periodic Task[ExeTime, Period]: ",inputlist[1])
+    print("APeriodic Task[ExeTime, ArrivalTime]: ",inputlist[2])
     return inputlist
 
 def module(inputlist):
@@ -359,9 +384,9 @@ def module(inputlist):
     for i in range(len(inputlist[3])):
         obj.PushAPeriodicTask(task_module.APeriodicTask("APTask "+str(i+1), inputlist[3][i][0], inputlist[3][i][1]))
     obj.CalHyperPeriod()
-    APresult, TotalResult=obj.CalTask()
+    APresult, TotalResult, HP=obj.CalTask()
     AvgWaitTime=CalAveWaitingTime(APresult)
-    return AvgWaitTime, TotalResult
+    return AvgWaitTime, TotalResult, HP
 
 if __name__=="__main__":
     print("Test Execution on scheduler_module.py")
@@ -392,6 +417,6 @@ if __name__=="__main__":
     
     #module(lst1)    
     list3=InputGenerator()
-    list3.insert(0, "PollingService")
+    list3.insert(0, "DeferrableService")
     module(list3)
     

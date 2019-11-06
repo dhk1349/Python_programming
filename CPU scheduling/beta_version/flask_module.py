@@ -22,11 +22,8 @@ def chart():
       list3=InputGenerator()
       list3.insert(0, result['Scheduler'])
       g.input=list3
-      g.AvgWaitTime, g.TotalResult = module(list3)
+      g.AvgWaitTime, g.TotalResult, g.HP = module(list3)
       return render_template("chart.html",result = result)
 
 if __name__=="__main__":
-    #lst1=["DeferrableService", [[4,10],[8,20]],[[1,5],[1,12]]]
-    #result1=module(lst1)
-    #print(result1)
     app.run(host="0.0.0.0", port=1080, debug=True)
