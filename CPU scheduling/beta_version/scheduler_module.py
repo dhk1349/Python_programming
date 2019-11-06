@@ -103,21 +103,7 @@ class PollingService:
             return True
         return False
         
-    def Check(self):
-        #Function that checks if it's possible to schedule tasks with given info
-        left_hand=self.PSExeTime/self.PSPeriod
-        for i in self.PeriodicTasks:
-            temp=i.GetExeTime()/i.GetPeriod()
-            left_hand+=temp
-        TotalTask=(len(self.PeriodicTasks)+1)
-        right_hand=TotalTask*(2**(1/TotalTask)-1)
-        return left_hand<=right_hand
-        
     def CalTask(self):
-        if (self.Check()==False):
-            print("This Task will Fail")
-            #return 0
-        print("This may not Fail")
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
             self.Interrupter(i)
@@ -208,17 +194,6 @@ class DeferrableService:
         self.CacheDS=self.DSExeTime[0]
         return tic
     
-    def Check(self):
-        #Function that checks if it's possible to schedule tasks with given info
-        left_hand=self.ConstDSExe/self.DSPeriod
-        for i in self.PeriodicTasks:
-            temp=i.GetExeTime()/i.GetPeriod()
-            left_hand+=temp
-            #print(left_hand)
-        TotalTask=(len(self.PeriodicTasks)+1)
-        right_hand=TotalTask*(2**(1/TotalTask)-1)
-        return left_hand<=right_hand        
-    
     def CalTask(self):
         for i in range(self.HyperPeriod):#iterating one cycle of HyperPerid
             print("Time ",i)
@@ -248,13 +223,17 @@ def CalAveWaitingTime(resultlist):
     for i in range(len(resultlist)):
         if type(resultlist[i]) is list:#AP task가 존재
             if tasklist.get(resultlist[i][0])==None:#아직 없음
-                tasklist[resultlist[i][0]]=[resultlist[i][1]]
+                if i==resultlist[i][1]:
+                    tasklist[resultlist[i][0]]=[resultlist[i][1]]                
+                else:
+                    tasklist[resultlist[i][0]]=[resultlist[i][1], i]
             else:#뭔가 있음 
                 #print(tasklist.get(resultlist[i][0]), "여기다가 추가할 거", tasklist.get(resultlist[i][0]).append(i))
+                print ("else로 들어왔다는 말 ")
                 temp=tasklist.get(resultlist[i][0])
                 temp.append(i)
                 tasklist[resultlist[i][0]]=temp
-    print(tasklist)
+    print("***", tasklist)
     for i in list(tasklist.values()):
         total=0
         if len(i)==1:
@@ -262,10 +241,10 @@ def CalAveWaitingTime(resultlist):
             #print("appending", total)
             continue
         for j in range(len(i)):#이러면 리스트가 반환
-            if j==0:
+            if j==0:#first element
                 continue
             else:
-                total=total+(i[j]-i[j-1]-1)
+                total=total+(i[j]-i[j-1])
         #print("appending", total)
         waitlist.append(total)
     print("Wait lsit" , waitlist)
@@ -273,8 +252,7 @@ def CalAveWaitingTime(resultlist):
     #print("acg wait time ", result)
     #print (tasklist)
     waitlist=[sum(waitlist), len(waitlist)]
-    print (waitlist)
-    return waitlist
+    return waitlist[0]/waitlist[1]
 
 def HarmonizedInputGenerator():
     DivisorSet=[[3, 5], [2, 2, 5], [2, 3, 5]]
@@ -334,6 +312,7 @@ def HarmonizedInputGenerator():
     #print (APTask)
     #[server, Task, APTask]
     #print ([Server, Task, APTask])
+    APTask.sort(key=lambda list:list[1])
     return [Server, Task, APTask]
 
 def check(inputlist):
@@ -383,7 +362,6 @@ def module(inputlist):
     APresult, TotalResult=obj.CalTask()
     AvgWaitTime=CalAveWaitingTime(APresult)
     return AvgWaitTime, TotalResult
-
 
 if __name__=="__main__":
     print("Test Execution on scheduler_module.py")

@@ -22,7 +22,7 @@ def chart():
       list3=InputGenerator()
       list3.insert(0, result['Scheduler'])
       g.input=list3
-      g.result, g.TotalResult = module(list3)
+      g.AvgWaitTime, g.TotalResult = module(list3)
       return render_template("chart.html",result = result)
 
 if __name__=="__main__":
