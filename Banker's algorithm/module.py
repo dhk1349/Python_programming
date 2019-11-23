@@ -15,5 +15,101 @@ Created on Fri Nov 22 00:40:24 2019
 
 들어오는 값은 특정 프로세스 x가 추가적인 자원의 요청 값 
   
+그냥 instance를 오브젝트로 만들고, Reource를 스택으로 구현하면?
 """ 
+class Resource:
+    def __init__(self,name, num):
+        self.Name=name
+        self.InstanceNum=num
+        self.CurNum=num
+        
+    def CheckUseResource(self, num):
+        if self.InstanceNum-num!=0:
+            #self.CurNum-=num
+            return 1
+        else:
+            return 0 
+           
+    def UseResource(self, num):
+        if self.InstanceNum-num!=0:
+            self.CurNum-=num
+            return 1
+        else:
+            return 0
+        
+    def GetName(self):
+        return self.Name
+    
+    def GetCurResource(self): #remaining Resource
+        return self.CurNum
+    
+class Process:
+    def __init__(self,name, max_lst):
+        self.Name=name
+        self.MaxList=max_lst
+        self.CurrentList=[0]*len(max_lst)
+    
+    def CheckAllocate(self, lst):
+        for i in range(len(self.MaxList)):
+            if self.CurrentList[i]+lst[i]>self.MaxList[i]:
+                return 0
+        #for i in range(len(self.MaxList)):
+        #    self.CurrentList[i]+=lst[i]
+        return 1
+    
+    def Allocate(self, lst):
+        for i in range(len(self.MaxList)):
+            if self.CurrentList[i]+lst[i]>self.MaxList[i]:
+                return 0
+        for i in range(len(self.MaxList)):
+            self.CurrentList[i]+=lst[i]
+        return 1
+    
+    def GetName(self):
+        return self.Name
+    
+    def GetCurrentState(self):
+        return self.CurrentList
+    
+class Manager:
+    def __init__(self, ResourceLst, ProcessLst):
+        self.Resources=ResourceLst
+        self.Processes=ProcessLst
 
+    def GetResource(self, name):
+        for i in self.Resources:
+            if i.GetName()==name:
+                return i
+        return None
+    
+    def GetProcess(self, name):
+        for i in self.Pricesses:
+            if i.GetName()==name:
+                return i
+        return None
+           
+    def ResourceRequest(self,processname, instnums): #return 1 if succeed
+        #check if resource can is suficient
+        for i in range(len(instnums)):
+            if (self.Resources[i].CheckUseResource(instnums[i])==0):
+                return 0
+        #bring process and check
+        process=self.GetProcee(processname)
+        if process==None:
+            return 0
+        return process.Allocate(instnums)
+    
+    def PrintInfo(self):
+        for i in self.Resources:
+            print(i.GetName())
+        for i in self. Processes:
+            print(i.GetName())
+    
+A=Resource('A', 10)
+B=Resource('B', 5)
+C=Resource('C', 7)
+P0=Process('p0', [7, 5, 3])
+P1=Process('p1', [3, 2, 2])
+P2=Process('p2', [9, 0, 2])
+manager=Manager([A,B,C], [P0, P1, P2])
+manager.PrintInfo()
