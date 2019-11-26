@@ -17,7 +17,7 @@ class Register:
         elif "Wait" not in self.State:
             self.State='Fail'
         elif 'Wait' in self.State:
-            self.State='proceed'
+            self.State='Proceed'
         else:
             self.State='unexpected case'
             
@@ -29,7 +29,14 @@ class Register:
     def CheckSuccess(self, index):
         self.State[index]='Success'
         self.Order+=str(index)
+        self.StatusCheck()
         
+    def GetStatus(self):
+        return self.Status
+    
+    def GetState(self):
+        return self.State
+    
     def PrintInfo(self):
         for i in self.State:
             print(i)

@@ -16,9 +16,9 @@ class Manager:
         self.Register=Register_module.Register(len(ProcessLst))
 
     def GetResource(self, name):
-        for i in self.Resources:
-            if i.GetName()==name:
-                return i
+        for i in range(len(self.Resources)):
+            if self.Resources[i].GetName()==name:
+                return self.Resources[i], i
         return None
     
     def GetProcess(self, name):
@@ -50,7 +50,7 @@ class Manager:
         
         """
         NeedList=[]
-        process=self.GetProcess(processname)
+        process,index=self.GetProcess(processname)
         for i in range(len(process.GetMaxResource())):
             NeedList.append(process.GetMaxResource()[i]-process.GetCurrentState()[i])
         
@@ -64,6 +64,17 @@ class Manager:
         templist=process.ReleaseResouces()
         for i in range(len(self.Resouces)):
             self.Resources[i].AddResource(templist[i])
+        self.Register.CheckSuccess(index)
+        
+        if self.Register.GetStatus()=='Fail':
+            return 0
+        elif self.Register.GetStatus()=='Success':
+            return 1
+        self.Register.ResetFail()
+        
+        for i in range(len(self.Register.GetState())):
+            if self.Register.GetState()[i]=='Wait':
+                self.SafetyCheck(self.Processes[i].GetName())
         
        
        
@@ -74,5 +85,7 @@ if __name__=="__main__":
     P0=module.Process('p0', [7, 5, 3])
     P1=module.Process('p1', [3, 2, 2])
     P2=module.Process('p2', [9, 0, 2])
-    manager=Manager([A,B,C], [P0, P1, P2])
+    P3=module.Process('p3', [2, 2, 2])
+    P4=module.Process('p4', [4, 3, 3])
+    manager=Manager([A,B,C], [P0, P1, P2, P3, P4])
     manager.PrintInfo()
