@@ -38,8 +38,8 @@ class Resource:
             return 0
     
     def AddResource(self, num):
-        self.InstanceNum+=num
-        return self.InstanceNum
+        self.CurNum+=num
+        return self.CurNum
     
     def GetName(self):
         return self.Name
@@ -71,7 +71,7 @@ class Process:
     
     def ReleaseResources(self):
         temp=self.CurrentList
-        self.CurrentList=[0]*len(max_lst)
+        self.CurrentList=[0]*len(self.MaxList)
         return temp
     
     def GetName(self):
@@ -80,7 +80,7 @@ class Process:
     def GetCurrentState(self):
         return self.CurrentList
     
-    def GeMaxResource(self):
+    def GetMaxResource(self):
         return self.MaxList
         
-if __name__=="__main__":
+#if __name__=="__main__":

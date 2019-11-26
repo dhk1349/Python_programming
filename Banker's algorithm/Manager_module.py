@@ -22,7 +22,7 @@ class Manager:
         return None
     
     def GetProcess(self, name):
-        for i in self.Pricesses:
+        for i in self.Processes:
             if i.GetName()==name:
                 return i
         return None
@@ -33,7 +33,7 @@ class Manager:
             if (self.Resources[i].CheckUseResource(instnums[i])==0):
                 return 0
         #bring process and check
-        process=self.GetProcee(processname)
+        process=self.GetProcess(processname)
         if process==None:
             return 0
         return process.Allocate(instnums)
@@ -41,14 +41,16 @@ class Manager:
     def PrintInfo(self):
         for i in self.Resources:
             print(i.GetName())
+            print(i.GetCurResource())
         for i in self. Processes:
             print(i.GetName())
+            print(i.GetCurrentState())
     
     def SafetyCheck(self, processname):
-        """
-        Recursive function
         
-        """
+        #Recursive function
+        
+        
         NeedList=[]
         process,index=self.GetProcess(processname)
         for i in range(len(process.GetMaxResource())):
@@ -57,15 +59,14 @@ class Manager:
         #Compare with available list
         #if not enough return 0 and exit
         for i in range(len(NeedList)):
-            if NeedList[i]>self.Resources[i]:
+            if NeedList[i]>self.Resources[i].GetCurResource():
                 return 0
             
         #Can safely execute this proccess
-        templist=process.ReleaseResouces()
-        for i in range(len(self.Resouces)):
+        templist=process.ReleaseResources()
+        for i in range(len(self.Resources)):
             self.Resources[i].AddResource(templist[i])
         self.Register.CheckSuccess(index)
-        
         if self.Register.GetStatus()=='Fail':
             return 0
         elif self.Register.GetStatus()=='Success':
@@ -74,7 +75,8 @@ class Manager:
         
         for i in range(len(self.Register.GetState())):
             if self.Register.GetState()[i]=='Wait':
-                self.SafetyCheck(self.Processes[i].GetName())
+                result=self.SafetyCheck(self.Processes[i].GetName())
+                print(processname,result)
         
        
        
@@ -89,3 +91,12 @@ if __name__=="__main__":
     P4=module.Process('p4', [4, 3, 3])
     manager=Manager([A,B,C], [P0, P1, P2, P3, P4])
     manager.PrintInfo()
+    
+    manager.ResourceRequest('p0', [0,1,0])
+    manager.ResourceRequest('p1', [2,0,0])
+    manager.ResourceRequest('p2', [3,0,2])
+    manager.ResourceRequest('p3', [2,1,1])
+    manager.ResourceRequest('p4', [0,0,2])
+    manager.PrintInfo()
+
+ 

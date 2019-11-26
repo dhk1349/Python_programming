@@ -15,16 +15,16 @@ class Register:
         if 'Fail' not in self.State and 'Wait' not in self.State:
             self.Status='Success'
         elif "Wait" not in self.State:
-            self.State='Fail'
+            self.Status='Fail'
         elif 'Wait' in self.State:
-            self.State='Proceed'
+            self.Status='Proceed'
         else:
-            self.State='unexpected case'
+            self.Status='unexpected case'
             
     def ResetFail(self):
-        for i in self.State:
-            if i=='Fail':
-                i='Wait'
+        for i in range(len(self.State)):
+            if self.State[i]=='Fail':
+                self.State[i]='Wait'
     
     def CheckSuccess(self, index):
         self.State[index]='Success'
@@ -37,13 +37,16 @@ class Register:
     def GetState(self):
         return self.State
     
+    def GetOrder(self):
+        return self.Order
+    
     def PrintInfo(self):
         for i in self.State:
             print(i)
 
-if __name__=="__main__":
-    reg=Register(3)
-    reg.PrintInfo()
+#if __name__=="__main__":
+#    reg=Register(3)
+#    reg.PrintInfo()
             
     """            
     input_lst=['Fail','Wait','Fail','Success','Fail']
