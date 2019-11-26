@@ -71,8 +71,28 @@ class Process:
     def GetCurrentState(self):
         return self.CurrentList
     
+    def GeMaxResource(self):
+        return self.MaxList
+
+class Register:
+    def __init__(self, length):
+        self.State=['w']*length
+        self.Status='Proceed'
+        
+    def StatusCheck(self):
+        if 'Fail' not in self.State and 'Wait' not in self.State:
+            self.Status='Success'
+        elif "Wait" not in self.State:
+            self.State='Fail'
+        elif 'Wait' in self.State:
+            self.State='proceed'
+        else:
+            self.State='unexpected case'
+        
 class Manager:
     def __init__(self, ResourceLst, ProcessLst):
+        #Requirement: resource list in process obj has to be
+        #same order wirh resource list list in Manager obj
         self.Resources=ResourceLst
         self.Processes=ProcessLst
 
@@ -105,6 +125,20 @@ class Manager:
         for i in self. Processes:
             print(i.GetName())
     
+    def SafetyCheck(self, processname):
+        """
+        Recursive function
+        
+        """
+        NeedList=[]
+        process=self.GetProcess(processname)
+        for i in range(len(process.GetMaxResource())):
+            NeedList.append(process.GetMaxResource()[i]-process.GetCurrentState()[i])
+        #Compare with available list
+        for i in range(len(NeedList)):
+            if NeedList[i]>self.Resources[i]:
+                return 0
+"""       
 A=Resource('A', 10)
 B=Resource('B', 5)
 C=Resource('C', 7)
@@ -113,3 +147,16 @@ P1=Process('p1', [3, 2, 2])
 P2=Process('p2', [9, 0, 2])
 manager=Manager([A,B,C], [P0, P1, P2])
 manager.PrintInfo()
+"""
+input_lst=['Fail','Wait','Fail']
+def StatusCheck(State):
+    if 'Fail' not in State and 'Wait' not in State:
+        Status='Success'
+    elif "Wait" not in State:
+        Status='Fail'
+    elif 'Wait' in State:
+        Status='proceed'
+    else:
+        Status='unexpected case'
+    print(Status)
+StatusCheck(input_lst)
