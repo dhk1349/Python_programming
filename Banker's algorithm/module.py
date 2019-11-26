@@ -36,7 +36,11 @@ class Resource:
             return 1
         else:
             return 0
-        
+    
+    def AddResource(self, num):
+        self.InstanceNum+=num
+        return self.InstanceNum
+    
     def GetName(self):
         return self.Name
     
@@ -65,6 +69,11 @@ class Process:
             self.CurrentList[i]+=lst[i]
         return 1
     
+    def ReleaseResources(self):
+        temp=self.CurrentList
+        self.CurrentList=[0]*len(max_lst)
+        return temp
+    
     def GetName(self):
         return self.Name
     
@@ -73,90 +82,5 @@ class Process:
     
     def GeMaxResource(self):
         return self.MaxList
-
-class Register:
-    def __init__(self, length):
-        self.State=['w']*length
-        self.Status='Proceed'
         
-    def StatusCheck(self):
-        if 'Fail' not in self.State and 'Wait' not in self.State:
-            self.Status='Success'
-        elif "Wait" not in self.State:
-            self.State='Fail'
-        elif 'Wait' in self.State:
-            self.State='proceed'
-        else:
-            self.State='unexpected case'
-        
-class Manager:
-    def __init__(self, ResourceLst, ProcessLst):
-        #Requirement: resource list in process obj has to be
-        #same order wirh resource list list in Manager obj
-        self.Resources=ResourceLst
-        self.Processes=ProcessLst
-
-    def GetResource(self, name):
-        for i in self.Resources:
-            if i.GetName()==name:
-                return i
-        return None
-    
-    def GetProcess(self, name):
-        for i in self.Pricesses:
-            if i.GetName()==name:
-                return i
-        return None
-           
-    def ResourceRequest(self,processname, instnums): #return 1 if succeed
-        #check if resource can is suficient
-        for i in range(len(instnums)):
-            if (self.Resources[i].CheckUseResource(instnums[i])==0):
-                return 0
-        #bring process and check
-        process=self.GetProcee(processname)
-        if process==None:
-            return 0
-        return process.Allocate(instnums)
-    
-    def PrintInfo(self):
-        for i in self.Resources:
-            print(i.GetName())
-        for i in self. Processes:
-            print(i.GetName())
-    
-    def SafetyCheck(self, processname):
-        """
-        Recursive function
-        
-        """
-        NeedList=[]
-        process=self.GetProcess(processname)
-        for i in range(len(process.GetMaxResource())):
-            NeedList.append(process.GetMaxResource()[i]-process.GetCurrentState()[i])
-        #Compare with available list
-        for i in range(len(NeedList)):
-            if NeedList[i]>self.Resources[i]:
-                return 0
-"""       
-A=Resource('A', 10)
-B=Resource('B', 5)
-C=Resource('C', 7)
-P0=Process('p0', [7, 5, 3])
-P1=Process('p1', [3, 2, 2])
-P2=Process('p2', [9, 0, 2])
-manager=Manager([A,B,C], [P0, P1, P2])
-manager.PrintInfo()
-"""
-input_lst=['Fail','Wait','Fail']
-def StatusCheck(State):
-    if 'Fail' not in State and 'Wait' not in State:
-        Status='Success'
-    elif "Wait" not in State:
-        Status='Fail'
-    elif 'Wait' in State:
-        Status='proceed'
-    else:
-        Status='unexpected case'
-    print(Status)
-StatusCheck(input_lst)
+if __name__=="__main__":
