@@ -77,7 +77,13 @@ class Manager:
             if self.Register.GetState()[i]=='Wait':
                 result=self.SafetyCheck(self.Processes[i].GetName())
                 print(processname,result)
-        
+                
+    def Calculate():
+        #Put Resources Obj 
+        #Put Processes Obj
+        #Request Resources
+        #Do SafetyCheck
+        return 0
        
        
 if __name__=="__main__":       

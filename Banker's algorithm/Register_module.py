@@ -19,7 +19,7 @@ class Register:
         elif 'Wait' in self.State:
             self.Status='Proceed'
         else:
-            self.Status='unexpected case'
+            self.State='unexpected case'
             
     def ResetFail(self):
         for i in range(len(self.State)):
@@ -28,7 +28,7 @@ class Register:
     
     def CheckSuccess(self, index):
         self.State[index]='Success'
-        self.Order+=str(index)
+        self.Order=self.Order+"  "+str(index)
         self.StatusCheck()
         
     def GetStatus(self):
