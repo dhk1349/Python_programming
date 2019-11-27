@@ -5,6 +5,12 @@ Created on Wed Nov 27 20:27:49 2019
 @author: dhk1349
 """
 
+def Check(Resourcelst, processmaxlst, processresourcelst):
+    #Things need to be checked 
+    
+
+
+
 def InputMode():
     ResourcesNum=int(input("Enter Number of Resources: "))
     InstanceNum=input("Enter numbers of Instance for each resource: ")
