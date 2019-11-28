@@ -19,21 +19,23 @@ class Manager:
         for i in range(len(self.Resources)):
             if self.Resources[i].GetName()==name:
                 return self.Resources[i], i
-        return None
+        return None, None
     
     def GetProcess(self, name):
-        for i in self.Processes:
-            if i.GetName()==name:
-                return i
-        return None
+        for i in range(len(self.Processes)):
+            if self.Processes[i].GetName()==name:
+                return self.Processes[i],i
+        return None,None
            
     def ResourceRequest(self,processname, instnums): #return 1 if succeed
         #check if resource can is suficient
         for i in range(len(instnums)):
             if (self.Resources[i].CheckUseResource(instnums[i])==0):
-                return 0
+                return 0   
+        for i in range(len(instnums)):
+            self.Resources[i].UseResource(instnums[i])
         #bring process and check
-        process=self.GetProcess(processname)
+        process,Null=self.GetProcess(processname)
         if process==None:
             return 0
         return process.Allocate(instnums)
@@ -45,45 +47,63 @@ class Manager:
         for i in self. Processes:
             print(i.GetName())
             print(i.GetCurrentState())
-    
+    def GetRegInfo(self):
+        print (self.Register.GetStatus())
+        print (self.Register.GetOrder())
+        
     def SafetyCheck(self, processname):
         
         #Recursive function
         
-        
         NeedList=[]
-        process,index=self.GetProcess(processname)
+        (process,index)=self.GetProcess(processname)
         for i in range(len(process.GetMaxResource())):
             NeedList.append(process.GetMaxResource()[i]-process.GetCurrentState()[i])
-        
+        ###
+        print("comparing")
+        for i in range(len(NeedList)):
+            print (NeedList[i], " and ", self.Resources[i].GetCurResource())
+        ###
         #Compare with available list
         #if not enough return 0 and exit
         for i in range(len(NeedList)):
             if NeedList[i]>self.Resources[i].GetCurResource():
+                print(processname, " returned 0")
                 return 0
-            
+        
         #Can safely execute this proccess
         templist=process.ReleaseResources()
+        print(processname, " success")
+        print("available")
         for i in range(len(self.Resources)):
-            self.Resources[i].AddResource(templist[i])
+            print(self.Resources[i].AddResource(templist[i]))
         self.Register.CheckSuccess(index)
+        
+        print(self.Register.GetStatus())
+
         if self.Register.GetStatus()=='Fail':
             return 0
         elif self.Register.GetStatus()=='Success':
+            print('exiting function with success')
             return 1
         self.Register.ResetFail()
         
         for i in range(len(self.Register.GetState())):
             if self.Register.GetState()[i]=='Wait':
+                print ('function for ', self.Processes[i].GetName())
                 result=self.SafetyCheck(self.Processes[i].GetName())
-                print(processname,result)
-                
+                #print(processname,result)
+        
     def Calculate():
         #Put Resources Obj 
         #Put Processes Obj
         #Request Resources
         #Do SafetyCheck
         return 0
+    
+    def GetResult(self):
+        return self.Register.GetStatus(), self.Register.GetOrder()
+
        
        
 if __name__=="__main__":       

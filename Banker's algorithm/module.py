@@ -31,6 +31,9 @@ class Resource:
     def GetName(self):
         return self.Name
     
+    def GetMaxResource(self):
+        return self.InstanceNum
+    
     def GetCurResource(self): #remaining Resource
         return self.CurNum
     
