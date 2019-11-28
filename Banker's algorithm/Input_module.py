@@ -39,19 +39,47 @@ def InputMode():
     print (ProcessResourceList)
     print (ProcessMaxList)
 
+def LogScaleRandom(start, end, base):
+    start=int(start)
+    end=int(end)
+    number=random.randrange(1, math.floor(pow(base, end-start)+1))
+    return (end-math.ceil(math.log(number,base)))
+
 def RandomeInputGenerator():
     #number of Resources: 3-100
     #number of Instances: ?
     #number of processes: 
     #number of Max resources for each process
     #number of request resources for each process
-    number=random.randrange(1, pow(3, 97)+1)
-    print(100-math.ceil(math.log(number,3)))
-    ResourcesNum=number
-    InstanceNum
-    ProcessNum
-    ProcessMaxList
-    ProcessResourcList
+    #number=random.randrange(1, pow(3, 97)+1)
+    #print(100-math.ceil(math.log(number,3)))
+    ResourcesNum=LogScaleRandom(3, 100, 3)
+    ProcessNum=LogScaleRandom(3, 100, 2)
+    InstanceNum=[]
+    print(ResourcesNum)
+    print(ProcessNum)
+    
+    for i in range(ResourcesNum):
+        InstanceNum.append(LogScaleRandom(4,100,2))
+    print(InstanceNum)
+    
+    InstanceRecord=InstanceNum
+    ProcessMaxList=[]
+    ProcessResourceList=[]
+    for i in range(ProcessNum):
+        templst=[]
+        templst2=[]
+        for j in range(ResourcesNum):
+            maxnum=LogScaleRandom(3,100,2)
+            templst.append(maxnum)
+            reqnum=LogScaleRandom(0, min(InstanceRecord[j], maxnum),1.3)
+            InstanceRecord[j]-=reqnum
+            templst2.append(reqnum)
+        ProcessMaxList.append(templst)
+        ProcessResourceList.append(templst2)
+    print(ProcessMaxList)
+    print(ProcessResourceList)
+    
     
 #InputMode()
 RandomeInputGenerator()
