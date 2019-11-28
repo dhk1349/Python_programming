@@ -60,37 +60,40 @@ class Manager:
         for i in range(len(process.GetMaxResource())):
             NeedList.append(process.GetMaxResource()[i]-process.GetCurrentState()[i])
         ###
-        print("comparing")
-        for i in range(len(NeedList)):
-            print (NeedList[i], " and ", self.Resources[i].GetCurResource())
+        #print("comparing")
+        #for i in range(len(NeedList)):
+            #print (NeedList[i], " and ", self.Resources[i].GetCurResource())
+            
         ###
         #Compare with available list
         #if not enough return 0 and exit
         for i in range(len(NeedList)):
             if NeedList[i]>self.Resources[i].GetCurResource():
-                print(processname, " returned 0")
+                #print(processname, " returned 0")
                 return 0
         
         #Can safely execute this proccess
         templist=process.ReleaseResources()
-        print(processname, " success")
-        print("available")
+        #print(processname, " success")
+        #print("available")
         for i in range(len(self.Resources)):
-            print(self.Resources[i].AddResource(templist[i]))
+            self.Resources[i].AddResource(templist[i])
+            #print(self.Resources[i].AddResource(templist[i]))
+            
         self.Register.CheckSuccess(index)
         
-        print(self.Register.GetStatus())
+        #print(self.Register.GetStatus())
 
         if self.Register.GetStatus()=='Fail':
             return 0
         elif self.Register.GetStatus()=='Success':
-            print('exiting function with success')
+            #print('exiting function with success')
             return 1
         self.Register.ResetFail()
         
         for i in range(len(self.Register.GetState())):
             if self.Register.GetState()[i]=='Wait':
-                print ('function for ', self.Processes[i].GetName())
+                #print ('function for ', self.Processes[i].GetName())
                 result=self.SafetyCheck(self.Processes[i].GetName())
                 #print(processname,result)
         
