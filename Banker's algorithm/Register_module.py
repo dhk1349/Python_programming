@@ -30,7 +30,12 @@ class Register:
         self.State[index]='Success'
         self.Order=self.Order+"  "+str(index)
         self.StatusCheck()
-        
+
+    def FinalCheck(self):
+        if self.Status=="Proceed":
+            self.Status='Fail'
+        if self.Status=="Fail":
+            self.Order=""
     def GetStatus(self):
         return self.Status
     

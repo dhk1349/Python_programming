@@ -43,8 +43,9 @@ def InputMode():
 def LogScaleRandom(start, end, base):
     start=int(start)
     end=int(end)
-    number=random.randrange(1, math.floor(pow(base, end-start)+1))
-    return (end-math.ceil(math.log(number,base)))
+    number=random.randrange(1, math.floor(pow(base, end-start+1))+1)
+    
+    return (end-math.floor(math.log(number,base)))
 
 def RandomeInputGenerator():
     #number of Resources: 2-10
@@ -54,35 +55,43 @@ def RandomeInputGenerator():
     #number of request resources for each process
     #number=random.randrange(1, pow(3, 97)+1)
     #print(100-math.ceil(math.log(number,3)))
-    ResourcesNum=LogScaleRandom(2, 10, 3)
-    ProcessNum=LogScaleRandom(3, 100, 2)
+    ResourcesNum=LogScaleRandom(2, 10, 2)
+    #print("resourcenum is ",ResourcesNum)
+    ProcessNum=LogScaleRandom(3, 100, 3)
     InstanceNum=[]
-    #print(ResourcesNum)
-    #print(ProcessNum)
-    
+    #print("ProcessNum is ", ProcessNum)
+    InstanceRecord=[]
     for i in range(ResourcesNum):
-        InstanceNum.append(LogScaleRandom(4,100,1.3))
+        num=LogScaleRandom(4,100,1.3)
+        InstanceNum.append(num)
+        InstanceRecord.append(num)
+    #print("Instance num")    
     #print(InstanceNum)
     
-    InstanceRecord=InstanceNum
+
     ProcessMaxList=[]
     ProcessResourceList=[]
     for i in range(ProcessNum):
         templst=[]
         templst2=[]
         for j in range(ResourcesNum):
-            maxnum=LogScaleRandom(3,100,2)
+            maxnum=LogScaleRandom(1,InstanceNum[j],2)
             templst.append(maxnum)
-            reqnum=LogScaleRandom(0, min(InstanceRecord[j], maxnum),1.3)
-            InstanceRecord[j]-=reqnum
+            #reqnum=LogScaleRandom(1, maxnum,1.3)
+            reqnum=random.randrange(0, min(InstanceRecord[j], maxnum)+1)
             templst2.append(reqnum)
+            InstanceRecord[j]-=reqnum
         ProcessMaxList.append(templst)
         ProcessResourceList.append(templst2)
-    #print(ProcessMaxList)
-    #print(ProcessResourceList)
+    """
+    print("ProcessMaxList")
+    print(ProcessMaxList)
+    print("ProcessResourceList")    
+    print(ProcessResourceList)
+    """
     return InstanceNum, ProcessMaxList, ProcessResourceList
     
 if __name__=="__main__":
     print("Inpt_module")
-    InputMode()
-    #RandomeInputGenerator()
+    #InputMode()
+    RandomeInputGenerator()

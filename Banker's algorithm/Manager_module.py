@@ -41,20 +41,27 @@ class Manager:
         return process.Allocate(instnums)
     
     def PrintInfo(self):
+        print("Resource Instance")
         for i in self.Resources:
-            print(i.GetName())
-            print(i.GetCurResource())
+            print(i.GetName()+": "+ str(i.GetMaxResource()))
+            
+        print("Resource Available Instance")
+        for i in self.Resources:
+            print(i.GetName()+": "+ str(i.GetCurResource()))
+        print("MAX")
         for i in self. Processes:
-            print(i.GetName())
-            print(i.GetCurrentState())
+            print(i.GetName()+": "+str(i.GetMaxResource()))
+            
+        print("Allocation")
+        for i in self. Processes:
+            print(i.GetName()+": "+str(i.GetCurrentState()))
+            
     def GetRegInfo(self):
         print (self.Register.GetStatus())
         print (self.Register.GetOrder())
         
     def SafetyCheck(self, processname):
-        
         #Recursive function
-        
         NeedList=[]
         (process,index)=self.GetProcess(processname)
         for i in range(len(process.GetMaxResource())):
@@ -105,6 +112,7 @@ class Manager:
         return 0
     
     def GetResult(self):
+        self.Register.FinalCheck()
         return self.Register.GetStatus(), self.Register.GetOrder()
 
        

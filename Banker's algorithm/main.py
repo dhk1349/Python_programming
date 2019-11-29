@@ -19,14 +19,13 @@ def ConnectionModule(InstanceNum, ProcessMaxList, ProcessResourceList):
     
     manager=Manager_module.Manager(ResourceList, ProcessList)
     print("*****Initializing modules completed*****")
-    manager.PrintInfo()
     print("**********Requesting Resources***********")
-    
     index=0
     for i in range(len(ProcessResourceList)):
         manager.ResourceRequest("P"+str(i), ProcessResourceList[i])
         index=i
-        
+    manager.PrintInfo()
+  
     print("from process 0 to ",str(index),", choose process to execute (ex. P1, P2...)", sep="")
     startprocess=input(">>")
     manager.SafetyCheck(startprocess)
