@@ -41,10 +41,10 @@ if __name__=="__main__":
 
     if gettype=="1":
         InstanceNum, ProcessMaxList, ProcessResourceList=Input_module.InputMode()
+        ConnectionModule(InstanceNum, ProcessMaxList, ProcessResourceList)
     elif gettype=="2":
         InstanceNum, ProcessMaxList, ProcessResourceList=Input_module.RandomeInputGenerator()
+        ConnectionModule(InstanceNum, ProcessMaxList, ProcessResourceList)
     else:
         print("Illegal input!")
-        exit(1)
-    ConnectionModule(InstanceNum, ProcessMaxList, ProcessResourceList)
-    
+    exitline=input("Press anything to finish console...")
