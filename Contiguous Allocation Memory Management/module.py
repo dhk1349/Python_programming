@@ -89,16 +89,22 @@ class Memory:
         
         for i in self.ProcessList:
             if(i.GetBase()-Base>0):
+                print("making empty space")
                 self.EmptyList.append(EmptySpace([Base, i.GetBase(), "Empty-"+str(index)]))
                 index+=1
-                Base=i.GetEnd()
             elif(i.GetBase()-Base<0):
                 print ("Illegal Allocation of Memory")
                 self.EmptyList=[]
                 return 0
+            Base=i.GetEnd()
+        
         if len(self.ProcessList)==0:
             self.EmptyList.append(EmptySpace([self.base, self.end, "Empty Base"]))
-    
+        else:
+            if(self.end-Base>0):
+                print("making empty space")
+                self.EmptyList.append(EmptySpace([Base, i.GetBase(), "Empty-"+str(index)]))
+                index+=1
             
     def AddProcess(self, data):
         """
@@ -192,6 +198,7 @@ class Manager:
                 self.Memory.DeleteProcess(data[i])
             else:
                 #add Process
+                print("adding")
                 self.Memory.InitializeEmptySpace()
                 self.Memory.AddProcess([int(data[i+1]), data[i]])
         self.Memory.InitializeEmptySpace()
