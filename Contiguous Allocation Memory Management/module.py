@@ -89,9 +89,9 @@ class Memory:
         
         for i in self.ProcessList:
             if(i.GetBase()-Base>0):
-                print("making empty space")
-                self.EmptyList.append(EmptySpace([Base, i.GetBase(), "Empty-"+str(index)]))
-                index+=1
+                print("making empty space1")
+                #self.EmptyList.append(EmptySpace([Base+1, i.GetBase(), "Empty-"+str(index)]))
+                #index+=1
             elif(i.GetBase()-Base<0):
                 print ("Illegal Allocation of Memory")
                 self.EmptyList=[]
@@ -99,11 +99,12 @@ class Memory:
             Base=i.GetEnd()
         
         if len(self.ProcessList)==0:
+            print("making empty space2")
             self.EmptyList.append(EmptySpace([self.base, self.end, "Empty Base"]))
         else:
             if(self.end-Base>0):
-                print("making empty space")
-                self.EmptyList.append(EmptySpace([Base, i.GetBase(), "Empty-"+str(index)]))
+                print("making empty space3")
+                self.EmptyList.append(EmptySpace([Base+1, self.end, "Empty-"+str(index)]))
                 index+=1
             
     def AddProcess(self, data):
@@ -118,30 +119,37 @@ class Memory:
             if(i.GetLimit()>(data[0])):
                 #process can fit into this space
                 if bestmin==-1:
-                    print("1")
+                    #print("1")
                     bestmin=i.GetLimit()-data[0]
                     bestindex=i.GetName()
                 elif bestmin>(i.GetLimit()-data[0]):
-                    print("2")
+                    #print("2")
                     #best fits so far
                     bestmin=i.GetLimit()-data[0]
                     bestindex=i.GetName()
-                else:
-                    print("NONE of them above")
+                #else:
+                    #print("NONE of them above")
         if bestindex==-1:
             print("Illegal situation")
             return 0
         else:
+            print("Bestmin: ", str(bestmin), "\nBestindex: ", str(bestindex))
             EmptyObj=self.SearchEmptyObject(bestindex)
             Base=EmptyObj.GetBase()
+            """
             for i in range(len(self.ProcessList)):
+                #iterates to insert
                 if self.ProcessList[i].GetBase()>Base:
                     #initialize process
                     print("Process Added")
-                    self.ProcessList.insert(i, Process([Base, Base+data[0], data[1]]))
+                    self.ProcessList.insert(i, Process([Base, Base+data[0], "process-"data[1]]))
                     break
             if(len(self.ProcessList)==0):
-                self.ProcessList.append(Process([Base, Base+data[0],"Process-1"+data[1]]))
+                print("Process Added")
+                self.ProcessList.append(Process([Base, Base+data[0],"Process-"+data[1]]))
+            """
+            self.ProcessList.append(Process([Base, Base+data[0]-1,"Process-"+data[1]]))
+            self.ProcessList.sort(key=lambda x: x.GetBase())
             
     def DeleteProcess(self, data):
         """
@@ -192,17 +200,20 @@ class Manager:
         #print(data)
         
         for i in range(0, len(data), 2):
+            print("input: ",data[i], ", ", data[i+1] )
+            
             if int(data[i+1])==0:
                 #erase process
                 self.Memory.InitializeEmptySpace()
                 self.Memory.DeleteProcess(data[i])
             else:
                 #add Process
-                print("adding")
+                #print("adding")
                 self.Memory.InitializeEmptySpace()
                 self.Memory.AddProcess([int(data[i+1]), data[i]])
+            self.Memory.InitializeEmptySpace()
+            self.Memory.PrintStatus()
         self.Memory.InitializeEmptySpace()
-
         self.Memory.PrintStatus()
 if __name__=="__main__":
     a=Manager()
