@@ -27,7 +27,7 @@ class Process:
         return self.end
     def PrintInfo(self):
         print("===========")
-        print(self.name)
+        print(self.name)    
         print(self.base)
         print(self.end)
         print("===========")
@@ -174,21 +174,38 @@ class Memory:
         return
     
     def PrintStatus(self):
-        """
-        이건 나중에,,
-        while True:
-            EmptyIndex=0
-            ProcessIndex=0
-            
-            
-            if(EmptyIndex==len(self.ProcessList) and ProcessIndex==len(self.ProcessList)):
-                break
+        Processbool=False
+        Emptybool=False
+        Processindex=0
+        Emptyindex=0
+        while ((not Processbool) or (not Emptybool)):
+            #문제: 둘 중 하나가 끝나면?
+            if Processbool==False:
+                ProcBase=self.ProcessList[Processindex].GetBase()
+            else:
+                ProcBase=self.end+1
+            if Emptybool==False:
+                EmptyBase=self.EmptyList[Emptyindex].GetBase()
+            else:
+                EmptyBase=self.end+1
+                
+            if(ProcBase<EmptyBase):
+                self.ProcessList[Processindex].PrintInfo()
+                Processindex+=1
+            else:
+                self.EmptyList[Emptyindex].PrintInfo()
+                Emptyindex+=1
+            if(len(self.ProcessList)==Processindex):
+               Processbool=True
+            if(len(self.EmptyList)==Emptyindex):
+               Emptybool=True
+           
         """
         for i in self.EmptyList:
             i.PrintInfo()
         for i in self.ProcessList:
             i.PrintInfo()
-
+        """
 class Manager:
     def __init__(self):
         self.Memory=Memory([0, 255])
@@ -215,6 +232,7 @@ class Manager:
             self.Memory.PrintStatus()
         self.Memory.InitializeEmptySpace()
         self.Memory.PrintStatus()
+        
 if __name__=="__main__":
     a=Manager()
     a.Execute()
