@@ -11,6 +11,9 @@ Requirment:
     -Allocate process to space where it best fits.
     -Coalescing
     -Compaction (Brute force case and efficient case each)
+    
+    
+Detecting coalescing = make self.var that counts the length of processlist and emptylist
 """
 class Process:
     def __init__(self, initializer):
@@ -22,9 +25,10 @@ class Process:
     
     def GetBase(self):
         return self.base
-    
     def GetEnd(self):
         return self.end
+    def GetName(self):
+        return self.name
     def PrintInfo(self):
         print("===========")
         print(self.name)    
@@ -84,26 +88,24 @@ class Memory:
     def InitializeEmptySpace(self):
         #initialize empty space after operation
         Base=self.base
-        index=0
+        index=1
         self.EmptyList=[]
         
         for i in self.ProcessList:
-            if(i.GetBase()-Base>0):
-                print("making empty space1")
-                #self.EmptyList.append(EmptySpace([Base+1, i.GetBase(), "Empty-"+str(index)]))
-                #index+=1
-            elif(i.GetBase()-Base<0):
-                print ("Illegal Allocation of Memory")
+            if(i.GetBase()-Base<0):
+                #print ("Illegal Allocation of Memory")
                 self.EmptyList=[]
                 return 0
+            elif(i.GetBase()>Base+1):
+                self.EmptyList.append(EmptySpace([Base, i.GetBase()-1, "Empty Base-"+str(index)]))
+                index+=1
             Base=i.GetEnd()
-        
         if len(self.ProcessList)==0:
-            print("making empty space2")
-            self.EmptyList.append(EmptySpace([self.base, self.end, "Empty Base"]))
+            #print("making empty space2")
+            self.EmptyList.append(EmptySpace([self.base, self.end, "Empty Base-0"]))
         else:
             if(self.end-Base>0):
-                print("making empty space3")
+                #print("making empty space3")
                 self.EmptyList.append(EmptySpace([Base+1, self.end, "Empty-"+str(index)]))
                 index+=1
             
@@ -156,8 +158,9 @@ class Memory:
         data:
             name
         """
-        process=self.SearchProcess(data)
+        process=self.SearchProcess("Process-"+data)
         if process!=0:
+            print("removing")
             self.ProcessList.remove(process)
             return 1
         return 0
@@ -179,7 +182,6 @@ class Memory:
         Processindex=0
         Emptyindex=0
         while ((not Processbool) or (not Emptybool)):
-            #문제: 둘 중 하나가 끝나면?
             if Processbool==False:
                 ProcBase=self.ProcessList[Processindex].GetBase()
             else:
@@ -215,22 +217,24 @@ class Manager:
         data=fd.readline()
         data=data.split()
         #print(data)
-        
+        self.Memory.InitializeEmptySpace()
         for i in range(0, len(data), 2):
             print("input: ",data[i], ", ", data[i+1] )
             
             if int(data[i+1])==0:
                 #erase process
-                self.Memory.InitializeEmptySpace()
                 self.Memory.DeleteProcess(data[i])
             else:
                 #add Process
                 #print("adding")
-                self.Memory.InitializeEmptySpace()
+                #print("BEFORE ADD")
+                #self.Memory.PrintStatus()
                 self.Memory.AddProcess([int(data[i+1]), data[i]])
             self.Memory.InitializeEmptySpace()
             self.Memory.PrintStatus()
-        self.Memory.InitializeEmptySpace()
+            self.Memory.InitializeEmptySpace()
+        print("*****Final Result*****")
+        #self.Memory.InitializeEmptySpace()
         self.Memory.PrintStatus()
         
 if __name__=="__main__":
