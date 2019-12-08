@@ -230,6 +230,12 @@ class Memory:
                     resultlist.append(Process(Base, Base+templist[0].GetLimit(), templist[0].GetName()))
                     Base+=(templist[0].GetLimit()+1)
                     templist.remove(templist[0])
+                for i in templist:
+                    if i.GetBase()==Base:
+                        templist.remove(i)
+                        Base=i.GetEnd()+1
+                    else:
+                        break
                 #exit condition을 달아야할 듯
             if(len(templist)==0):
                 Top=False
@@ -255,10 +261,19 @@ class Memory:
                     #없는 경우
                     resultlist.append(Process(End, End+templist[0].GetLimit(), templist[0].GetName()))
                     End+=(templist[0].GetLimit()+1)
-                    templist.remove(templist[0])        
+                    templist.remove(templist[0])
+                
+                for i in range(len(templist), -1, -1):
+                    if i.GetEnd()==End:
+                        templist.remove(templist[i])
+                        End=i.GetBase()-1
+                    else:
+                        break
+            if(len(templist)==0):
+                Top=False
+                Bottom=False
             #여기서 다시 확인 
             
-                       
         return
     
     def PrintEmptyInfo(self):        
@@ -295,10 +310,11 @@ class Memory:
            
 class Manager:
     def __init__(self):
-        self.Memory=Memory([0, 255])
-    
+        #self.Memory=Memory([0, 255])
+        self.Memory=Memory([0, 20+7+3+10+20+3])
     def Execute(self):
-        fd=open('input.txt','r')
+        #fd=open('input.txt','r')
+        fd=open('input2.txt','r')
         data=fd.readline()
         data=data.split()
         #print(data)
@@ -314,10 +330,14 @@ class Manager:
             self.Memory.PrintEmptyInfo()
             #self.Memory.PrintStatus()
             self.Memory.InitializeEmptySpace()
+            if i==3:
+                self.Memory.EfficientCompaction()
+            self.Memory.PrintStatus()
         print("*****Final Result*****")
         #self.Memory.InitializeEmptySpace()
-        self.Memory.PrintStatus()
-        self.Memory.Compaction()
+        #self.Memory.PrintStatus()
+            
+        #self.Memory.Compaction()
         self.Memory.PrintStatus()
         
 if __name__=="__main__":
