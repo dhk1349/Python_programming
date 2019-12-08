@@ -186,11 +186,84 @@ class Memory:
     
     def Compaction(self): 
         print("Compaction")
+        #Brute Force
+        print("Brute Force")
+        Base=self.base
+        TempProcList=[]
+        for i in self.ProcessList:
+            TempProcList.append(Process([Base, Base+i.GetLimit(), i.GetName()]))
+            Base+=(i.GetLimit()+1)
+        self.ProcessList=TempProcList
+        self.InitializeEmptySpace()
+        return 1
+    def EfficientCompaction(self):
+        Top=True
+        Bottom=True
+        
+        Base=self.base
+        End=self.end
+        templist=self.ProcessList
+        resultlist=[]
+        while(Top or Bottom):
+            for i in templist:
+                if(i.GetBase()<Base or i.GetEnd()>End):
+                    templist.remove(i)
+            #top
+            if(Top==True):
+                #끝이 있음
+                if(Base==templist[0].GetBase()):
+                    Base=(templist[0].GetEnd()+1)
+                    resultlist.append(templist[0])
+                    templist.remove(templist[0])
+                #끝이 없음
+                else:
+                    Space=templist[0].GetBase()-Base
+                    for i in templist[1:]:
+                        Procsize=i.GetLimit()+1
+                        #맞는 사이즈가 있음 
+                        if Space==Procsize:
+                            resultlist.append(Process([Base, Base+Procsize-1, i.GetName()]))
+                            Base+=Procsize
+                            templist.remove(i)
+                            break
+                    #없는 경우
+                    resultlist.append(Process(Base, Base+templist[0].GetLimit(), templist[0].GetName()))
+                    Base+=(templist[0].GetLimit()+1)
+                    templist.remove(templist[0])
+                #exit condition을 달아야할 듯
+            if(len(templist)==0):
+                Top=False
+                Bottom=False
+            #bottom
+            if(Bottom==True):
+                #끝이 있음 
+                if(End==templist[-1].GetEnd()):
+                    End=(templist[-1].GetBase()-1)
+                    resultlist.append(templist[-1])
+                    templist.remove(templist[-1])
+                #끝이 없음
+                else:
+                    Space=End-templist[-1].GetEnd()
+                    for i in range(len(templist)-2, -1, -1):
+                        Procsize=templist[i].GetLimit()+1
+                        #맞는 사이즈가 있음 
+                        if Space==Procsize:
+                            resultlist.append(Process([End-Procsize+1, End, templist[i].GetName()]))
+                            End-=Procsize
+                            templist.remove(templist[i])
+                            break
+                    #없는 경우
+                    resultlist.append(Process(End, End+templist[0].GetLimit(), templist[0].GetName()))
+                    End+=(templist[0].GetLimit()+1)
+                    templist.remove(templist[0])        
+            #여기서 다시 확인 
+            
+                       
         return
     
     def PrintEmptyInfo(self):        
         EmptySpace=0
-        for i in self.EmptyList:
+        for i in self.EmptyList:    
             EmptySpace+=(i.GetLimit()+1)
         print("\t", EmptySpace, "K free, ",len(self.EmptyList), " block(s), average size= ",round(EmptySpace/len(self.EmptyList)),"K\n", sep="")
     
@@ -243,6 +316,8 @@ class Manager:
             self.Memory.InitializeEmptySpace()
         print("*****Final Result*****")
         #self.Memory.InitializeEmptySpace()
+        self.Memory.PrintStatus()
+        self.Memory.Compaction()
         self.Memory.PrintStatus()
         
 if __name__=="__main__":
