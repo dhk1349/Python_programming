@@ -114,7 +114,7 @@ class Memory:
                 self.EmptyList.append(EmptySpace([Base+1, self.end, "Empty -"+str(index)]))
                 index+=1
             
-    def AddProcess(self, data):
+    def AddProcess(self, data, triger=False):
         """
         data:    
             [size, name]
@@ -135,6 +135,19 @@ class Memory:
                     bestindex=i.GetName()
                 #else:
                     #print("NONE of them above")
+        if bestindex==-1:
+            self.EfficientCompaction()
+            for i in self.EmptyList:
+                if(i.GetLimit()+1>=(data[0])):
+                #process can fit into this space
+                    if bestmin==-1:
+                        #print("1")
+                        bestmin=i.GetLimit()-data[0]+1
+                        bestindex=i.GetName()
+                    elif bestmin>(i.GetLimit()-data[0]+1):
+                        #best fits so far
+                        bestmin=i.GetLimit()-data[0]+1
+                        bestindex=i.GetName()
         if bestindex==-1:
             print("Illegal situation")
             return 0
@@ -197,9 +210,9 @@ class Memory:
         self.InitializeEmptySpace()
         return 1
     def EfficientCompaction(self):
+        print("Compaction Process")
         Top=True
         Bottom=True
-        
         Base=self.base
         End=self.end
         templist=self.ProcessList
@@ -218,24 +231,34 @@ class Memory:
                 #끝이 없음
                 else:
                     Space=templist[0].GetBase()-Base
+                    temp=False
                     for i in templist[1:]:
                         Procsize=i.GetLimit()+1
                         #맞는 사이즈가 있음 
                         if Space==Procsize:
+                            temp=True
                             resultlist.append(Process([Base, Base+Procsize-1, i.GetName()]))
                             Base+=Procsize
                             templist.remove(i)
                             break
                     #없는 경우
-                    resultlist.append(Process(Base, Base+templist[0].GetLimit(), templist[0].GetName()))
-                    Base+=(templist[0].GetLimit()+1)
-                    templist.remove(templist[0])
+                    if temp==False:
+                        resultlist.append(Process([Base, Base+templist[0].GetLimit(), templist[0].GetName()]))
+                        Base+=(templist[0].GetLimit()+1)
+                        templist.remove(templist[0])
                 for i in templist:
                     if i.GetBase()==Base:
+                        #print("1. removing ",i.GetName())
+                        resultlist.append(i)
                         templist.remove(i)
                         Base=i.GetEnd()+1
                     else:
                         break
+                """    
+                index=0
+                while True:
+                    if templist
+                """
                 #exit condition을 달아야할 듯
             if(len(templist)==0):
                 Top=False
@@ -250,30 +273,45 @@ class Memory:
                 #끝이 없음
                 else:
                     Space=End-templist[-1].GetEnd()
+                    temp=False
                     for i in range(len(templist)-2, -1, -1):
                         Procsize=templist[i].GetLimit()+1
                         #맞는 사이즈가 있음 
                         if Space==Procsize:
+                            temp=True
                             resultlist.append(Process([End-Procsize+1, End, templist[i].GetName()]))
                             End-=Procsize
                             templist.remove(templist[i])
                             break
                     #없는 경우
-                    resultlist.append(Process(End, End+templist[0].GetLimit(), templist[0].GetName()))
-                    End+=(templist[0].GetLimit()+1)
-                    templist.remove(templist[0])
+                    if temp==False:
+                        #print(templist[-1].GetName())
+                        resultlist.append(Process([End-templist[-1].GetLimit(), End, templist[-1].GetName()]))    
+                        End+=(templist[-1].GetLimit()+1)
+                        templist.remove(templist[-1])
                 
-                for i in range(len(templist), -1, -1):
-                    if i.GetEnd()==End:
-                        templist.remove(templist[i])
-                        End=i.GetBase()-1
+                for i in range(len(templist)-1, -1, -1):
+                    if templist[i].GetEnd()==End:
+                        #print("2. removing ",templist[i].GetName())
+                        End=templist[i].GetBase()-1
+                        resultlist.append(templist[i])
+                        templist.remove(templist[i])                    
                     else:
                         break
             if(len(templist)==0):
                 Top=False
                 Bottom=False
-            #여기서 다시 확인 
-            
+            #여기서 다시 확인
+           # print("***")
+            #for i in resultlist:
+            #    print(i.GetName()," - ", i.GetBase(),"-", i.GetEnd())
+            #print(resultlist)
+            #print(templist)
+        resultlist.sort(key=lambda x: x.GetBase())
+        self.ProcessList=resultlist
+        self.InitializeEmptySpace()
+        #print("AFTER COMPACTION")
+        self.PrintStatus()
         return
     
     def PrintEmptyInfo(self):        
@@ -309,12 +347,12 @@ class Memory:
                Emptybool=True
            
 class Manager:
-    def __init__(self):
+    def __init__(self, size):
         #self.Memory=Memory([0, 255])
-        self.Memory=Memory([0, 20+7+3+10+20+3])
-    def Execute(self):
+        self.Memory=Memory([0, size-1])
+    def Execute(self, filename):
         #fd=open('input.txt','r')
-        fd=open('input2.txt','r')
+        fd=open(filename,'r')
         data=fd.readline()
         data=data.split()
         #print(data)
@@ -330,8 +368,6 @@ class Manager:
             self.Memory.PrintEmptyInfo()
             #self.Memory.PrintStatus()
             self.Memory.InitializeEmptySpace()
-            if i==3:
-                self.Memory.EfficientCompaction()
             self.Memory.PrintStatus()
         print("*****Final Result*****")
         #self.Memory.InitializeEmptySpace()
@@ -341,8 +377,12 @@ class Manager:
         self.Memory.PrintStatus()
         
 if __name__=="__main__":
-    a=Manager()
-    a.Execute()
+    filename=input("Enter file name: ")
+    size=int(input("Enter size of Memory: "))
+    #size=63
+    #filename="input2.txt"
+    a=Manager(size)
+    a.Execute(filename)
         
         
         
