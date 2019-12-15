@@ -311,7 +311,7 @@ class Memory:
         self.ProcessList=resultlist
         self.InitializeEmptySpace()
         #print("AFTER COMPACTION")
-        self.PrintStatus()
+        #self.PrintStatus()
         return
     
     def PrintEmptyInfo(self):        
@@ -368,7 +368,7 @@ class Manager:
             self.Memory.PrintEmptyInfo()
             #self.Memory.PrintStatus()
             self.Memory.InitializeEmptySpace()
-            self.Memory.PrintStatus()
+            #self.Memory.PrintStatus()
         print("*****Final Result*****")
         #self.Memory.InitializeEmptySpace()
         #self.Memory.PrintStatus()
@@ -383,6 +383,7 @@ if __name__=="__main__":
     #filename="input2.txt"
     a=Manager(size)
     a.Execute(filename)
+    b=input("Type anything to close...")
         
         
         
