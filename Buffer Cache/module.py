@@ -10,14 +10,18 @@ class Node:
         self.element=element
         self.status=status
         self.prev=prevN
-        self.next=nextN
-        
+        self.next=nextN       
     
     def SetNext(self, Node):
         self.next=Node
         
     def SetPrev(self, Node):
         self.prev=Node
+        
+    def SetElement(self, element):
+        self.element=element
+    def SetStatus(self, status):
+        self.status=status
 
 class CDLL:
     def __init__(self):
@@ -39,6 +43,7 @@ class CDLL:
         Cursor=self.HeadNode.next
         #while Cursor.element!="Head":
         #    if 
+        return
         
     def PrintList(self):
         Cursor=self.HeadNode.next

@@ -30,12 +30,14 @@ class BufferCache:
             #putevery Block in HashQueue
             if j==1:
                 status="Free"
+            elif j==2:
+                status="Delay"
             else:
                 status="Busy"
             print(i, "mod ->", mod)
             block=module.Node(element=i, status=status)
             self.ModList[mod].PushBack(block)
-            if j==1: #if free
+            if block.element!="Busy": #if free
                 self.FreeList[0].PushBack(copy.deepcopy(block))
             self.PrintAll()
 
@@ -53,7 +55,33 @@ class BufferCache:
         result=self.ModList[mod].SearchNode(blkNum)
         if result!=False:
             print(result.element, result.status," Found")
+            return result
+        return False
             
+    def GetBlock(self, blknum):
+        result=self.SearchHash(blknum)
+        if result!=False:
+            if result.status=="Busy":#scenario5
+                print("Block is now busy")
+            else:#scenario1
+                result.status="Busy"
+                self.FreeList.RemoveNode(result.element)
+                return result
+        else:
+            if(self.FreeList.EndNode.element=="Head"):#it means freelist is empty
+                print("Free list is empty. Must wait")
+            else:
+                while True:
+                    block=self.FreeList.RemoveNode(self.FreeList.HeadNode.next.element)
+                    
+                    if block.status=="Delay":
+                        print("asynchronous write buffer to disk")
+                        continue
+                    else:
+                        block.SetStatus("Busy")
+                        return block
+                        
+        
         
 if __name__=="__main__":
     inputlist=[(10,1),(5,0), (3,1), (11,0), (6,0), (8, 1)]
