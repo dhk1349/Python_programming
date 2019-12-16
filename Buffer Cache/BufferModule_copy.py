@@ -5,7 +5,6 @@ Created on Sat Dec 14 12:12:23 2019
 
 @author: donghoon
 
-
 Scenario
 #1 Requesting block that is in the freelist and queue
 #2 Requesting block that is not in the queque and freelist
@@ -92,7 +91,7 @@ def RandomInputGenerator():
     inputlist=[]
     for i in temp:
         #change time into log scale calculation
-        inputlist.append((i,random.randrange(1,11)))
+        inputlist.append((i,10-math.floor(math.log(random.randrange(1,3000),2))))
     print(len(inputlist))
     print(inputlist)
         
@@ -105,4 +104,5 @@ if __name__=="__main__":
     buf.SearchHash(11)
     """
     RandomInputGenerator()
+
     
