@@ -30,16 +30,17 @@ class BufferCache:
         for i,j in BlockNumList:
             mod=i%len(self.ModList)
             #putevery Block in HashQueue
-            if j==1:
+            if j==0:
                 status="Free"
-            elif j==2:
+            elif j==-1:
                 status="Delay"
             else:
                 status="Busy"
             print(i, "mod ->", mod)
-            block=module.Node(element=i, status=status)
+            print("Status: ", status)
+            block=module.Node(element=i, status=status, time=j)
             self.ModList[mod].PushBack(block)
-            if block.element!="Busy": #if free
+            if block.status=="Free" or block.status=="Delay": #if free
                 self.FreeList[0].PushBack(copy.deepcopy(block))
             self.PrintAll()
 
@@ -60,7 +61,15 @@ class BufferCache:
             return result
         return False
     
-    def UnlockBusy(self, blknum):
+    def FreeBlock(self):
+        for i in self.ModList:
+           for j in i.GetZeroCount():
+               #j is node
+               print(j.element," is free")
+               self.FreeList[0].PushBack(copy.deepcopy(j))
+               
+    def UnlockBusy(self):
+        """
         result=self.SearchHash(blknum)
         cnt=random.randrange(1,11)
         while cnt!=0:
@@ -68,37 +77,86 @@ class BufferCache:
             time.sleep(1)
             cnt-=1
         result.SetStatus("Free")
-        
+        """
+        flag=False
+        index=1
+        while flag==False:
+            print("Waiting Block to be Free... (", index, "sec)")
+            time.sleep(1)
+            index+=1
+            for i in self.ModList:
+                flag=i.ReduceCount() or flag
+        print("Before free block")
+        self.PrintAll()
+        self.FreeBlock()
         
     def GetBlock(self, blknum):
+        print("Requesting Block ", blknum,"...")
         result=self.SearchHash(blknum)
         if result!=False:
             if result.status=="Busy":#scenario5
                 print("Block is now busy")
+                while result.status!="Free":
+                    result.time-=1
+                    print("Waiting..")
+                    time.sleep(1)
+                    if result.time==0:
+                        result.status="Free"
             else:#scenario1
                 result.status="Busy"
-                self.FreeList.RemoveNode(result.element)
+                self.FreeList[0].RemoveNode(result.element)
                 return result
         else:
-            if(self.FreeList.EndNode.element=="Head"):#it means freelist is empty
+            if(self.FreeList[0].EndNode.element=="Head"):#it means freelist is empty
                 print("Free list is empty. Must wait")
-            else:
+                self.UnlockBusy()
+                self.PrintAll()
                 while True:
-                    block=self.FreeList.RemoveNode(self.FreeList.HeadNode.next.element)
-                    
+                    block=self.FreeList[0].RemoveNode(self.FreeList[0].HeadNode.next.element)
+                    self.ModList[block.element%self.ModNum].RemoveNode(block.element)
                     if block.status=="Delay":
                         print("asynchronous write buffer to disk")
+                        print("Delayed write for ", block.element)
                         continue
                     else:
+                        print("Removing Block ", block.element)
+                        block.SetElement(blknum)
+                        block.SetTime(random.randrange(1,11))
                         block.SetStatus("Busy")
+                        self.ModList[blknum%self.ModNum].PushBack(block)
+                        return block
+                
+            else:#free list not empty
+                while True:
+                    block=self.FreeList[0].RemoveNode(self.FreeList[0].HeadNode.next.element)
+                    self.ModList[block.element%self.ModNum].RemoveNode(block.element)
+                    if block.status=="Delay":
+                        print("asynchronous write buffer to disk")
+                        print("Delayed write for ", block.element)
+                        continue
+                    else:
+                        print("Removing Block ", block.element)
+                        block.SetElement(blknum)
+                        block.SetTime(random.randrange(1,11))
+                        block.SetStatus("Busy")
+                        self.ModList[blknum%self.ModNum].PushBack(block)
                         return block
                         
         
-        
+
 if __name__=="__main__":
-    inputlist=[(10,1),(5,0), (3,1), (11,0), (6,0), (8, 1)]
+    
+    #inputlist=[(10,1),(5,0), (3,1), (11,0), (6,0), (8, 1)] #S1, S2
+    #inputlist=[(10,1),(5,-1), (3,1), (11,0), (6,0), (8, 1)] #S3
+    inputlist=[(10,2),(5,2), (3,3), (11,5), (6,3), (8, 5)] #S4
     buf=BufferCache(3)
     buf.Initialize(inputlist)
     
-    buf.SearchHash(11)
+    #buf.SearchHash(11)
+    #buf.GetBlock(11) #S1
+    #buf.GetBlock(1) #S2 S3 S4
+    buf.GetBlock(10)
+    buf.PrintAll()
+    
+    
     

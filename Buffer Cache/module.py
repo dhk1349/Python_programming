@@ -6,11 +6,14 @@ Created on Fri Dec 13 09:32:43 2019
 @author: donghoon
 """
 class Node:
-    def __init__(self, element=None, status=None, prevN=None, nextN=None):
+    def __init__(self, element=None, status=None, prevN=None, nextN=None, time=0):
         self.element=element
         self.status=status
         self.prev=prevN
-        self.next=nextN       
+        self.next=nextN
+        self.time=time
+        #self.freeprev
+        #self.freenext
     
     def SetNext(self, Node):
         self.next=Node
@@ -22,6 +25,8 @@ class Node:
         self.element=element
     def SetStatus(self, status):
         self.status=status
+    def SetTime(self, time):
+        self.time=time
 
 class CDLL:
     def __init__(self):
@@ -33,16 +38,25 @@ class CDLL:
     
     def PushBack(self, Node):
         Node.SetPrev(self.EndNode)
-        Node.SetNext(self.EndNode.next)
         self.EndNode.SetNext(Node)
+        #Node.SetNext(self.EndNode.next)
+        Node.SetNext(self.HeadNode)
+        #self.EndNode.SetNext(Node)
         Node.next.SetPrev(Node)
         self.EndNode=Node
         
     def RemoveNode(self, NodeNum):
         #if self.SearchNode(NodeNum)==True:
         Cursor=self.HeadNode.next
-        #while Cursor.element!="Head":
-        #    if 
+        while Cursor.element!="Head":
+            if Cursor.element==NodeNum:
+                Cursor.prev.SetNext(Cursor.next)
+                Cursor.next.SetPrev(Cursor.prev)
+                Cursor.prev=None
+                Cursor.next=None
+                self.EndNode=self.HeadNode.prev
+                return Cursor
+            Cursor=Cursor.next
         return
         
     def PrintList(self):
@@ -58,7 +72,25 @@ class CDLL:
                 return Cursor
             Cursor=Cursor.next
         return False
-
+    
+    def GetZeroCount(self):
+        Cursor=self.HeadNode.next
+        while Cursor.element!="Head":
+            if Cursor.time==0:
+                Cursor.status="Free"
+                yield Cursor
+            Cursor=Cursor.next
+    
+    def ReduceCount(self):
+        Cursor=self.HeadNode.next
+        flag=False
+        while Cursor.element!="Head":
+            if Cursor.time>0:
+                Cursor.time-=1
+            if Cursor.time==0:
+                flag=True
+            Cursor=Cursor.next
+        return flag
 
 if __name__=="__main__":
     lst=CDLL()
