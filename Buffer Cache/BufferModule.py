@@ -15,6 +15,8 @@ Scenario
 """
 import copy
 import module
+import time
+import random
 
 class BufferCache:
     def __init__(self, ModNum):
@@ -57,7 +59,17 @@ class BufferCache:
             print(result.element, result.status," Found")
             return result
         return False
-            
+    
+    def UnlockBusy(self, blknum):
+        result=self.SearchHash(blknum)
+        cnt=random.randrange(1,11)
+        while cnt!=0:
+            print("Waiting Block to be Free")
+            time.sleep(1)
+            cnt-=1
+        result.SetStatus("Free")
+        
+        
     def GetBlock(self, blknum):
         result=self.SearchHash(blknum)
         if result!=False:
