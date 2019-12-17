@@ -36,13 +36,12 @@ class BufferCache:
                 status="Delay"
             else:
                 status="Busy"
-            print(i, "mod ->", mod)
-            print("Status: ", status)
+            #print(i, "mod ->", mod)
+            #print("Status: ", status)
             block=module.Node(element=i, status=status, time=j)
             self.ModList[mod].PushBack(block)
             if block.status=="Free" or block.status=="Delay": #if free
                 self.FreeList[0].PushBack(copy.deepcopy(block))
-            self.PrintAll()
 
     def PrintAll(self):
         for i in range(len(self.ModList)):
@@ -57,8 +56,9 @@ class BufferCache:
         mod=blkNum%self.ModNum
         result=self.ModList[mod].SearchNode(blkNum)
         if result!=False:
-            print(result.element, result.status," Found")
+            print(result.element," is " ,result.status,".", sep="")
             return result
+        print("Block ", blkNum, " is not Found.", sep="")
         return False
     
     def FreeBlock(self):
@@ -86,11 +86,12 @@ class BufferCache:
             index+=1
             for i in self.ModList:
                 flag=i.ReduceCount() or flag
-        print("Before free block")
-        self.PrintAll()
+        #print("Before free block")
+        #self.PrintAll()
         self.FreeBlock()
         
     def GetBlock(self, blknum):
+        print("*******************************")
         print("Requesting Block ", blknum,"...")
         result=self.SearchHash(blknum)
         if result!=False:
@@ -101,16 +102,21 @@ class BufferCache:
                     print("Waiting..")
                     time.sleep(1)
                     if result.time==0:
+                        print("Block is now free!")
                         result.status="Free"
+                result.time=random.randrange(1,11)
+                result.SetStatus("Busy")
+                print("*******************************\n")
+
             else:#scenario1
                 result.status="Busy"
                 self.FreeList[0].RemoveNode(result.element)
+                print("*******************************\n")
                 return result
         else:
             if(self.FreeList[0].EndNode.element=="Head"):#it means freelist is empty
                 print("Free list is empty. Must wait")
                 self.UnlockBusy()
-                self.PrintAll()
                 while True:
                     block=self.FreeList[0].RemoveNode(self.FreeList[0].HeadNode.next.element)
                     self.ModList[block.element%self.ModNum].RemoveNode(block.element)
@@ -124,6 +130,7 @@ class BufferCache:
                         block.SetTime(random.randrange(1,11))
                         block.SetStatus("Busy")
                         self.ModList[blknum%self.ModNum].PushBack(block)
+                        print("*******************************\n")
                         return block
                 
             else:#free list not empty
@@ -140,6 +147,7 @@ class BufferCache:
                         block.SetTime(random.randrange(1,11))
                         block.SetStatus("Busy")
                         self.ModList[blknum%self.ModNum].PushBack(block)
+                        print("*******************************\n")
                         return block
                         
         
@@ -148,14 +156,15 @@ if __name__=="__main__":
     
     #inputlist=[(10,1),(5,0), (3,1), (11,0), (6,0), (8, 1)] #S1, S2
     #inputlist=[(10,1),(5,-1), (3,1), (11,0), (6,0), (8, 1)] #S3
-    inputlist=[(10,2),(5,2), (3,3), (11,5), (6,3), (8, 5)] #S4
+    #inputlist=[(10,2),(5,2), (3,3), (11,5), (6,3), (8, 5)] #S4
+    inputlist=[(10,2),(5,2), (3,0), (11,5), (6,3), (8, 5)] #S5
     buf=BufferCache(3)
     buf.Initialize(inputlist)
     
     #buf.SearchHash(11)
     #buf.GetBlock(11) #S1
     #buf.GetBlock(1) #S2 S3 S4
-    buf.GetBlock(10)
+    buf.GetBlock(10) #S5
     buf.PrintAll()
     
     
