@@ -60,7 +60,21 @@ def BufferCacheModel():
         buf.PrintAll()
         
     elif ord(option)==54:
-        print("user input")
+        print("user input mode")
+        temp=input("Tpye input: ")
+        temp=temp.split()
+        inputlist=[]
+        for i in range(0,len(temp),2):
+            inputlist.append((int(temp[i]), int(temp[i+1])))
+        modnum=int(input("Type mod number: "))
+        req=int(input("What will you request? "))
+        
+        buf=BufferCache(modnum)
+        buf.Initialize(inputlist)
+        buf.PrintAll()
+        
+        buf.GetBlock(req)
+        buf.PrintAll()
         
     
     elif ord(option)==55:
