@@ -1,0 +1,41 @@
+--1
+CREATE TABLE DEPT
+  (ID NUMBER(7), 
+   NAME VARCHAR2(25)
+  );
+  
+--2
+INSERT INTO DEPT(ID, NAME) 
+  SELECT department_id, department_name
+  FROM departments;
+
+--3
+CREATE TABLE EMP
+  (ID NUMBER(7),
+  LAST_NAME VARCHAR2(25), 
+  FIRST_NAME VARCHAR2(25),
+  DEPT_ID NUMBER(7)
+  );
+
+--4
+ALTER TABLE EMP
+  MODIFY (LAST_NAME VARCHAR2(50));
+
+DESCRIBE EMP;
+
+--5
+DROP TABLE EMP;
+
+--6
+CREATE TABLE EMPLOYEES2 
+  (ID, FIRST_NAME, LAST_NAME, SALARY, DEPT_ID)
+  AS 
+    SELECT employee_id, FIRST_name, last_name, salary, department_id
+    FROM EMPLOYEES;
+    
+--7
+RENAME EMPLOYEES2 TO EMP;
+
+--8
+ALTER TABLE EMP
+DROP(first_name);
