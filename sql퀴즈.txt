@@ -1,0 +1,44 @@
+--1
+CREATE TABLE myClass
+  (stuId NUMBER(10),
+  fullname VARCHAR2(8) NOT NULL,
+  subject VARCHAR2(8),
+  grade CHAR(1),
+  CONSTRAINT "stu_id_pk" PRIMARY KEY(stuId));
+  
+--2
+DESCRIBE myClass;
+
+INSERT INTO myClass
+VALUES(2017101319, '한동훈', 'DATABASE','B');
+
+UPDATE myClass
+SET subject='DBClass', grade='A'
+WHERE stuId=2017101319;
+
+--3번
+Select First_name||' '|| last_name "FullName", job_id
+FROM employees;
+
+--4번
+SELECT first_name,  d.department_name
+FROM employees e, departments d
+WHERE(e.department_id=d.department_id)
+and (e.salary between 5000 and 15000);
+
+--5
+SELECT department_id, avg(salary), MAX(salary), MIN(salary)
+FROM employees
+GROUP BY department_id
+HAVING avg(salary)>=5000
+ORDER BY MAX(salary) DESC;
+
+--6
+SELECT count(*)
+FROM employees
+WHERE salary<(SELECT salary FROM employees WHERE last_name='Jones');
+
+--7
+SELECT employee_id, last_name
+FROM employees
+WHERE salary>(SELECT avg(salary) FROM employees);
