@@ -1,6 +1,6 @@
 from slacker import Slacker
 
-slack = Slacker('xoxb-1653942369987-1638972881335-nqt6FvguTNBm8JciOcCjjIfT')
+slack = Slacker('')
 
 import win32com.client
  
