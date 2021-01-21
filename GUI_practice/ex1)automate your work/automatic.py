@@ -1,0 +1,127 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'automateprogram.ui'
+#
+# Created by: PyQt5 UI code generator 5.9.2
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(500, 574)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(110, 30, 271, 41))
+        font = QtGui.QFont()
+        font.setFamily("나눔고딕 ExtraBold")
+        font.setPointSize(26)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.id = QtWidgets.QLabel(self.centralwidget)
+        self.id.setGeometry(QtCore.QRect(20, 122, 56, 20))
+        font = QtGui.QFont()
+        font.setFamily("나눔스퀘어 Bold")
+        font.setBold(True)
+        font.setWeight(75)
+        self.id.setFont(font)
+        self.id.setObjectName("id")
+        self.pw = QtWidgets.QLabel(self.centralwidget)
+        self.pw.setGeometry(QtCore.QRect(20, 152, 56, 20))
+        font = QtGui.QFont()
+        font.setFamily("나눔스퀘어 Bold")
+        font.setBold(True)
+        font.setWeight(75)
+        self.pw.setFont(font)
+        self.pw.setObjectName("pw")
+        self.search = QtWidgets.QLabel(self.centralwidget)
+        self.search.setGeometry(QtCore.QRect(40, 185, 101, 21))
+        font = QtGui.QFont()
+        font.setFamily("나눔스퀘어 Bold")
+        font.setBold(True)
+        font.setWeight(75)
+        self.search.setFont(font)
+        self.search.setObjectName("search")
+        self.status = QtWidgets.QLabel(self.centralwidget)
+        self.status.setGeometry(QtCore.QRect(330, 100, 101, 21))
+        font = QtGui.QFont()
+        font.setFamily("나눔스퀘어 Bold")
+        font.setBold(True)
+        font.setWeight(75)
+        self.status.setFont(font)
+        self.status.setObjectName("status")
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(100, 120, 113, 20))
+        self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit_3 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_3.setGeometry(QtCore.QRect(100, 150, 113, 20))
+        self.lineEdit_3.setObjectName("lineEdit_3")
+        self.lineEdit_5 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_5.setGeometry(QtCore.QRect(40, 210, 191, 21))
+        self.lineEdit_5.setObjectName("lineEdit_5")
+        self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
+        self.textEdit.setGeometry(QtCore.QRect(20, 270, 231, 251))
+        self.textEdit.setObjectName("textEdit")
+        self.content = QtWidgets.QLabel(self.centralwidget)
+        self.content.setGeometry(QtCore.QRect(30, 250, 51, 21))
+        font = QtGui.QFont()
+        font.setFamily("나눔스퀘어 Bold")
+        font.setBold(True)
+        font.setWeight(75)
+        self.content.setFont(font)
+        self.content.setObjectName("content")
+        self.result = QtWidgets.QTextBrowser(self.centralwidget)
+        self.result.setGeometry(QtCore.QRect(280, 130, 201, 371))
+        self.result.setObjectName("result")
+        self.go = QtWidgets.QPushButton(self.centralwidget)
+        self.go.setGeometry(QtCore.QRect(280, 510, 91, 23))
+        self.go.setObjectName("go")
+        self.stop = QtWidgets.QPushButton(self.centralwidget)
+        self.stop.setGeometry(QtCore.QRect(390, 510, 91, 23))
+        self.stop.setObjectName("stop")
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 500, 21))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+        self.go.clicked.connect(MainWindow.starts)
+        self.stop.clicked.connect(MainWindow.stops)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def starts(self, MainWindow):
+        print("start clicked")
+    def stops(self, MainWindow):
+        print("stop clicked")
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.label.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:16pt;\">Automate your work</span></p></body></html>"))
+        self.id.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">ID</p></body></html>"))
+        self.pw.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">PW</p></body></html>"))
+        self.search.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">URL 수집페이지</span></p></body></html>"))
+        self.status.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">상태창</p></body></html>"))
+        self.content.setText(_translate("MainWindow", "작성내용"))
+        self.go.setText(_translate("MainWindow", "Go"))
+        self.stop.setText(_translate("MainWindow", "Stop"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
+
