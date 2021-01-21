@@ -2,8 +2,8 @@
 
 
 
-![1](C:\Users\한동훈\Desktop\Github\Python_programming\GUI_practice\ex2)calculator\png\1.PNG)
+![1](\png\1.PNG)
 
 
 
-![2](C:\Users\한동훈\Desktop\Github\Python_programming\GUI_practice\ex2)calculator\png\2.PNG)
+![2](\png\2.PNG)
