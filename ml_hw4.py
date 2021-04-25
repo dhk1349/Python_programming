@@ -3,6 +3,7 @@
 Created on Fri Oct 30 19:29:13 2020
 
 @author: dhk1349
+@https://github.com/dhk1349/Python_programming/blob/master/ml_hw4.py
 """
 import numpy as np
 import math
