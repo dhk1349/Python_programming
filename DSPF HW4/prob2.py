@@ -58,11 +58,36 @@ class Graph:
                 s.append(n)
         return trace
 
+    def get_close(self, x, k):
+        """
+        q를 이중 loop를 사용한다.
+        """
+        # q = deque()
+        q=[]
+        passed = defaultdict(int)
+
+        trace = []
+        passed[x] = 1 #que안에 있는 것까지 모두 추적
+        q.append(self.graph[x].get_edge())
+        for i in range(k):  # Within distance k
+            nextq=[]
+            while len(q[i]) != 0:
+                next = q[i][-1]  # .popleft()
+                q[i]=q[i][:-1]
+                trace.append(next)
+                passed[next]=1
+                toadd = self.graph[next].get_edge()
+                toaddq=[]
+                for n in toadd:
+                    if passed[n] != 1:
+                    # if n not in trace and n not in q:
+                        nextq.append(n)
+            q.append(nextq)
+        return sorted(trace)
+
 if __name__ == "__main__":
     G = Graph("./small.txt")
-    for i in range(3):
-        print(f"bfs starting from {i}\n   {G.bfs(i)}\n\n")
-
-    for i in range(3):
-        print(f"dfs starting from {i}\n   {G.dfs(i)}\n\n")
+    for i in range(2):
+        for j in range(1,3):
+            print(f"Get close {i}, {j}:\n   {G.get_close(i, j)}\n\n")
 
