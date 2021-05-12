@@ -43,7 +43,8 @@ class Graph:
 
     def dfs(self, x):
         s = []  # pseudo stack
-
+        # 그냥 시작할 때 나머지 모든 노드를 넣어놓고 시작하도록 구상하기
+        # tree가 여러개여도 잘 작동함.
         trace = [x]
         toadd = sorted(self.graph[x].get_edge(), reverse=True)
         s.extend(toadd)
