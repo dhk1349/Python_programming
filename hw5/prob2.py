@@ -33,9 +33,9 @@ class FTNetwork(object):
         print("Epoch {0} complete".format(j))
 
   def update_mini_batch(self, mini_batch, lr, tuning):
+    nabla_b = [np.zeros(b.shape) for b in self.biases]
+    nabla_w = [np.zeros(w.shape) for w in self.weights]
     if tuning == False:
-      nabla_b = [np.zeros(b.shape) for b in self.biases]
-      nabla_w = [np.zeros(w.shape) for w in self.weights]
       for x, y in mini_batch:
         delta_nabla_b, delta_nabla_w = self.backprop(x, y, tuning=tuning)
         nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
