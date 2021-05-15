@@ -47,9 +47,9 @@ class MomentumNetwork(object):
     momentum_w = momentum * momentum_w + nabla_w
     
     self.weights = [w - (lr / len(mini_batch)) * nw
-                    for w, nw in zip(self.weights, nabla_w)]
+                    for w, nw in zip(self.weights, momentum_w)]
     self.biases = [b - (lr / len(mini_batch)) * nb
-                   for b, nb in zip(self.biases, nabla_b)]
+                   for b, nb in zip(self.biases, momentum_b)]
 
   def backprop(self, x, y):
       """Return a tuple ``(nabla_b, nabla_w)`` representing the
