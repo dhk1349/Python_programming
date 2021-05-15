@@ -33,22 +33,28 @@ class MomentumNetwork(object):
         print("Epoch {0} complete".format(j))
 
   def update_mini_batch(self, mini_batch, lr, momentum):
-    nabla_b = np.array([np.zeros(b.shape) for b in self.biases])
-    nabla_w = np.array([np.zeros(w.shape) for w in self.weights])
-    momentum_b = np.array([np.zeros(b.shape) for b in self.biases])
-    momentum_w = np.array([np.zeros(w.shape) for w in self.weights])
+    nabla_b = [np.zeros(b.shape) for b in self.biases]
+    nabla_w = [np.zeros(w.shape) for w in self.weights]
+    momentum_b = [np.zeros(b.shape) for b in self.biases]
+    momentum_w = [np.zeros(w.shape) for w in self.weights]
+    momentum_const_b = [np.full(b.shape, momentum) for b in self.biases]  
+    momentum_const_w = [np.full(w.shape, momentum) for w in self.weights]
     
     for x, y in mini_batch:
       delta_nabla_b, delta_nabla_w = self.backprop(x, y)
       nabla_b = np.array([nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)])
       nabla_w = np.array([nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)])
     
-    momentum_b = momentum * momentum_b + nabla_b
-    momentum_w = momentum * momentum_w + nabla_w
+    # momentum_b = momentum * momentum_b + nabla_b
+    # momentum_w = momentum * momentum_w + nabla_w
+    momentum_b = [mcb * mc + nb
+                    for mb, mcb, nb in zip(momentum_b, momentum_const_b, nabla_b)]
+    momentum_w = [mcw * mw + nw
+                   for mw, mcw, nw in zip(momentum_w, momentum_const_w, nabla_w)]
     
-    self.weights = [w - (lr / len(mini_batch)) * nw
+    self.weights = [w - (lr) * nw
                     for w, nw in zip(self.weights, momentum_w)]
-    self.biases = [b - (lr / len(mini_batch)) * nb
+    self.biases = [b - (lr) * nb
                    for b, nb in zip(self.biases, momentum_b)]
 
   def backprop(self, x, y):

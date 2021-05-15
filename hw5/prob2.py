@@ -40,9 +40,9 @@ class FTNetwork(object):
         delta_nabla_b, delta_nabla_w = self.backprop(x, y, tuning=tuning)
         nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
         nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-      self.weights = [w - (lr / len(mini_batch)) * nw
+      self.weights = [w - (lr) * nw
                     for w, nw in zip(self.weights, nabla_w)]
-      self.biases = [b - (lr / len(mini_batch)) * nb
+      self.biases = [b - (lr) * nb
                    for b, nb in zip(self.biases, nabla_b)]
     elif tuning == True:
       for x, y in mini_batch:
@@ -50,8 +50,8 @@ class FTNetwork(object):
         nabla_b = [nb + dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
         nabla_w = [nw + dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
       
-      self.weights[-1] = self.weights[-1] - (lr/len(mini_batch)) * nabla_w[-1]
-      self.biases[-1] = self.biases[-1] - (lr/len(mini_batch)) * nabla_b[-1]
+      self.weights[-1] = self.weights[-1] - (lr) * nabla_w[-1]
+      self.biases[-1] = self.biases[-1] - (lr) * nabla_b[-1]
       
   def backprop(self, x, y, tuning):
       """Return a tuple ``(nabla_b, nabla_w)`` representing the
