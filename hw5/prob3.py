@@ -10,7 +10,11 @@ class MomentumNetwork(object):
     self.biases = [self.rng.randn(y, 1) for y in sizes[1:]]
     self.weights = [self.rng.randn(y, x)
                     for x, y in zip(sizes[:-1], sizes[1:])]
-
+    self.momentum_b = [np.zeros(b.shape) for b in self.biases]
+    self.momentum_w = [np.zeros(w.shape) for w in self.weights]
+    self.momentum_const_b = [np.full(b.shape, momentum) for b in self.biases]  
+    self.momentum_const_w = [np.full(w.shape, momentum) for w in self.weights]
+    
   def feedforward(self, a):
     for b, w in zip(self.biases, self.weights):
       a = sigmoid(np.dot(w, a)+b)
@@ -35,10 +39,6 @@ class MomentumNetwork(object):
   def update_mini_batch(self, mini_batch, lr, momentum):
     nabla_b = [np.zeros(b.shape) for b in self.biases]
     nabla_w = [np.zeros(w.shape) for w in self.weights]
-    momentum_b = [np.zeros(b.shape) for b in self.biases]
-    momentum_w = [np.zeros(w.shape) for w in self.weights]
-    momentum_const_b = [np.full(b.shape, momentum) for b in self.biases]  
-    momentum_const_w = [np.full(w.shape, momentum) for w in self.weights]
     
     for x, y in mini_batch:
       delta_nabla_b, delta_nabla_w = self.backprop(x, y)
@@ -47,15 +47,15 @@ class MomentumNetwork(object):
     
     # momentum_b = momentum * momentum_b + nabla_b
     # momentum_w = momentum * momentum_w + nabla_w
-    momentum_b = [mcb * mc + nb
-                    for mb, mcb, nb in zip(momentum_b, momentum_const_b, nabla_b)]
-    momentum_w = [mcw * mw + nw
-                   for mw, mcw, nw in zip(momentum_w, momentum_const_w, nabla_w)]
+    self.momentum_b = [mcb * mb + nb
+                    for mb, mcb, nb in zip(self.momentum_b, self.momentum_const_b, nabla_b)]
+    self.momentum_w = [mcw * mw + nw
+                   for mw, mcw, nw in zip(self.momentum_w, self.momentum_const_w, nabla_w)]
     
     self.weights = [w - (lr) * nw
-                    for w, nw in zip(self.weights, momentum_w)]
+                    for w, nw in zip(self.weights, self.momentum_w)]
     self.biases = [b - (lr) * nb
-                   for b, nb in zip(self.biases, momentum_b)]
+                   for b, nb in zip(self.biases, self.momentum_b)]
 
   def backprop(self, x, y):
       """Return a tuple ``(nabla_b, nabla_w)`` representing the
