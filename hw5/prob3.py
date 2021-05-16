@@ -12,8 +12,7 @@ class MomentumNetwork(object):
                     for x, y in zip(sizes[:-1], sizes[1:])]
     self.momentum_b = [np.zeros(b.shape) for b in self.biases]
     self.momentum_w = [np.zeros(w.shape) for w in self.weights]
-    self.momentum_const_b = [np.full(b.shape, momentum) for b in self.biases]  
-    self.momentum_const_w = [np.full(w.shape, momentum) for w in self.weights]
+    
     
   def feedforward(self, a):
     for b, w in zip(self.biases, self.weights):
@@ -21,6 +20,9 @@ class MomentumNetwork(object):
     return a
 
   def SGD(self, training_data, epochs, mini_batch_size, lr, momentum, test_data=None):
+    self.momentum_const_b = [np.full(b.shape, momentum) for b in self.biases]  
+    self.momentum_const_w = [np.full(w.shape, momentum) for w in self.weights]
+      
     if test_data: n_test = len(test_data)
     n = len(training_data)
     for j in range(epochs):
