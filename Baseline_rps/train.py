@@ -24,15 +24,14 @@ def train(args):
           len(os.listdir(os.path.join(args.val_dir, 'rock/'))) + \
           len(os.listdir(os.path.join(args.val_dir, 'scissors/')))
 
-  transform = transforms.Compose([ToTensor()])
-  dataset_train = CustomDataset(args.train_dir, transform=transform)
-  loader_train = DataLoader(dataset_train, batch_size = args.batchsize, \
-          shuffle=True, collate_fn=dataset_train.custom_collate_fn, num_workers=8)
-  
-  dataset_val = CustomDataset(args.val_dir, transform=transform)
-  loader_val = DataLoader(dataset_val, batch_size=num_val, \
-          shuffle=True, collate_fn=dataset_train.custom_collate_fn, num_workers=8)
-  
+  transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.Resize((89, 100)), transforms.ToTensor()])
+  dataset_train = datasets.ImageFolder(root=args.train_dir, transform=transform)
+  loader_train = DataLoader(dataset_train, batch_size=args.batchsize,
+                            shuffle=True, num_workers=8)
+  dataset_val = datasets.ImageFolder(root=args.val_dir, transform=transform)
+  loader_val = DataLoader(dataset_val, batch_size=args.batchsize,
+                          shuffle=True, num_workers=8)
+
   # Define Model
   model = nn.Sequential(nn.Conv2d(1, 32, 2, padding=1),
                         nn.ReLU(),
@@ -72,8 +71,9 @@ def train(args):
   criterion = nn.CrossEntropyLoss().to(device)
   
   # Define the optimizer
+  # optim = torch.optim.SGD(model.parameters(), lr = 0.001)
   optim = torch.optim.Adam(model.parameters(), lr = 0.001)
-  
+
   best_epoch = 0
   accuracy_save = np.array(0)
   for epoch in range(args.epochs):
@@ -84,9 +84,11 @@ def train(args):
     correct_val = 0
     correct_batch = 0
 
-    for batch, data in enumerate(loader_train, 1):
-      label = data['label'].to(device)
-      input = data['input'].to(device)
+    for batch, (data, label) in enumerate(loader_train, 1):
+      # label = data['label'].to(device)
+      # input = data['input'].to(device)
+      label = label.to(device)
+      input = data.to(device)
 
       output = model(input)
       label_pred = soft(output).argmax(1)
@@ -112,11 +114,12 @@ def train(args):
 
       model.eval() 
       val_loss = []
-      for batch, data in enumerate(loader_val, 1):
+      for batch, (data, label) in enumerate(loader_val, 1):
+        label_val = label.to(device)
+        input_val = data.to(device)
+        # label_val = data['label'].to(device)
+        # input_val = data['input'].to(device)
 
-        label_val = data['label'].to(device)
-        input_val = data['input'].to(device)
-  
         output_val = model(input_val)
   
         label_val_pred = soft(output_val).argmax(1)

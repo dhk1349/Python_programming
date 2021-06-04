@@ -45,6 +45,7 @@ class CustomDataset(torch.utils.data.Dataset):
 
     for sample in data:
       prs_img = imageio.imread(os.path.join(sample[0] + sample[1]))
+      print(type(prs_img))
       gray_img = rgb2gray(prs_img)
 
       if gray_img.ndim == 2:
