@@ -6,8 +6,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
 
-from dataset import *
 from copy import copy
+from pyramidnet import PyramidNet
+from Resnet import *
 
 import warnings
 
@@ -20,20 +21,35 @@ def train(args):
           len(os.listdir(os.path.join(args.train_dir,'rock/'))) + \
           len(os.listdir(os.path.join(args.train_dir, 'scissors')))
   
-  num_val = len(os.listdir(os.path.join(args.val_dir, 'paper/'))) + \
-          len(os.listdir(os.path.join(args.val_dir, 'rock/'))) + \
-          len(os.listdir(os.path.join(args.val_dir, 'scissors/')))
+  num_val = len(os.listdir(os.path.join(args.val_dir, 'p/'))) + \
+          len(os.listdir(os.path.join(args.val_dir, 'r/'))) + \
+          len(os.listdir(os.path.join(args.val_dir, 's/')))
 
-  transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.Resize((89, 100)), transforms.ToTensor()])
+  # transform = transforms.Compose([transforms.Resize((256, 256)), transforms.RandomHorizontalFlip(p=0.5)
+  #                                 , transforms.RandomVerticalFlip(p=0.5), transforms.ToTensor()])
+  transform = transforms.Compose([transforms.Grayscale(3), transforms.Resize((224, 224)), transforms.RandomHorizontalFlip(), transforms.RandomVerticalFlip(),
+                                  transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
+  t2 = transforms.Compose([transforms.Grayscale(3), transforms.Resize((224, 224)), transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
+  # transform = transforms.Compose([transforms.Grayscale(num_output_channels=1), transforms.Resize((89, 100)), transforms.ColorJitter(), transforms.RandomHorizontalFlip(p=0.5)
+  #                                 , transforms.RandomVerticalFlip(p=0.5), transforms.ToTensor()])
   dataset_train = datasets.ImageFolder(root=args.train_dir, transform=transform)
   loader_train = DataLoader(dataset_train, batch_size=args.batchsize,
                             shuffle=True, num_workers=8)
-  dataset_val = datasets.ImageFolder(root=args.val_dir, transform=transform)
+  dataset_val = datasets.ImageFolder(root=args.val_dir, transform=t2)
   loader_val = DataLoader(dataset_val, batch_size=args.batchsize,
                           shuffle=True, num_workers=8)
 
+
   # Define Model
-  model = nn.Sequential(nn.Conv2d(1, 32, 2, padding=1),
+  # dataset_protoc = ["cifar10", "cifar100", "imagenet"]
+  # alpha = [48, 64, 300]
+  # depth = [164, 110, 200]
+  # numclass = 3
+  # bottleneck = [True, False, True]
+  # model = PyramidNet(dataset_protoc[2], 18, 8, numclass, bottleneck[0])
+
+  # Define Model
+  model = nn.Sequential(nn.Conv2d(3, 32, 2, padding=1),
                         nn.ReLU(),
                         nn.MaxPool2d(kernel_size=2),
                         nn.Conv2d(32, 64, 2, padding=1),
@@ -55,14 +71,20 @@ def train(args):
                         nn.ReLU(),
                         nn.MaxPool2d(kernel_size=1),
                         torch.nn.Flatten(),
-                        nn.Linear(64, 1000, bias = True),
+
+                        nn.Linear(576, 1000, bias = True),
                         nn.Dropout(0.75),
                         nn.Linear(1000, 3, bias = True),
                        )
-  
+
   soft = nn.Softmax(dim=1)
-  
+
+  # model = ResNet18()
+
+
+  print('the number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
   device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+  torch.cuda.set_device(device)
   print("Current device:", device)
   
   model.to(device)
@@ -73,6 +95,7 @@ def train(args):
   # Define the optimizer
   # optim = torch.optim.SGD(model.parameters(), lr = 0.001)
   optim = torch.optim.Adam(model.parameters(), lr = 0.001)
+  #optim = torch.optim.SGD(model.parameters(), lr = 0.001, momentum=0.9)
 
   best_epoch = 0
   accuracy_save = np.array(0)
@@ -91,6 +114,7 @@ def train(args):
       input = data.to(device)
 
       output = model(input)
+      # print(output.size())
       label_pred = soft(output).argmax(1)
   
       optim.zero_grad()
@@ -103,8 +127,11 @@ def train(args):
       correct_train += (label == label_pred).float().sum()
 
       # print(loss)
-      # train_loss += [loss.item()]
-      train_loss.append(loss.item())
+      try:
+          train_loss += [loss.item()]
+      except RuntimeError :
+          print(f"{input.size()} raised CUDA illegal access" )
+      # train_loss.append(loss.item())
 
     accuracy_train = correct_train / num_train
   
