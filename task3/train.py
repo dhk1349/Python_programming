@@ -9,8 +9,6 @@ from torchvision import transforms, datasets
 
 from copy import copy
 from dataset import *
-from pyramidnet import PyramidNet
-from Resnet import *
 from Mobilenet import *
 import warnings
 
@@ -34,6 +32,10 @@ def train(args):
                                                          hue=(-0.3, 0.3)), transforms.RandomRotation(90),
                                   transforms.ToTensor(),
                                   transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
+  aug_transform = transforms.Compose([transforms.RandomCrop((224, 224)), transforms.GaussianBlur(3), #or use RandomResizedCrop(224)
+                                  transforms.ColorJitter(brightness=(0.2, 2), contrast=(0.3, 2), saturation=(0.2, 2),
+                                                         hue=(-0.3, 0.3)), transforms.RandomRotation(90),
+                                  transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
   t2 = transforms.Compose([transforms.GaussianBlur(3), transforms.ColorJitter(brightness=(0.2, 2), contrast=(0.3, 2), saturation=(0.2, 2),
                             hue=(-0.3, 0.3)), transforms.ToTensor(),
                            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
@@ -49,52 +51,13 @@ def train(args):
                           shuffle=True, num_workers=8)
 
 
-  # Define Model
-  # dataset_protoc = ["cifar10", "cifar100", "imagenet"]
-  # alpha = [48, 64, 300]
-  # depth = [164, 110, 200]
-  # numclass = 3
-  # bottleneck = [True, False, True]
-  # model = PyramidNet(dataset_protoc[2], 18, 8, numclass, bottleneck[1])
-
-  # Define Model
-  # model = nn.Sequential(nn.Conv2d(3, 32, 2, padding=1),
-  #                       nn.ReLU(),
-  #                       nn.MaxPool2d(kernel_size=2),
-  #                       nn.Conv2d(32, 64, 2, padding=1),
-  #                       nn.ReLU(),
-  #                       nn.MaxPool2d(kernel_size=2),
-  #                       nn.Conv2d(64, 128, 2, padding=1),
-  #                       nn.ReLU(),
-  #                       nn.MaxPool2d(kernel_size=2),
-  #                       nn.Conv2d(128, 256, 2, padding=1),
-  #                       nn.ReLU(),
-  #                       nn.MaxPool2d(kernel_size=2),
-  #                       nn.Conv2d(256, 256, 2, padding=1),
-  #                       nn.ReLU(),
-  #                       nn.MaxPool2d(kernel_size=2),
-  #                       nn.Conv2d(256, 128, 2, padding=1),
-  #                       nn.ReLU(),
-  #                       nn.MaxPool2d(kernel_size=2),
-  #                       nn.Conv2d(128, 64, 2, padding=0),
-  #                       nn.ReLU(),
-  #                       nn.MaxPool2d(kernel_size=1),
-  #                       torch.nn.Flatten(),
-  #
-  #                       nn.Linear(576, 1000, bias = True),
-  #                       nn.Dropout(0.75),
-  #                       nn.Linear(1000, 3, bias = True),
-  #                      )
-
+  # define model
   soft = nn.Softmax(dim=1)
-
-  # model = ResNet18()
-  # model = mobilenetv3_small()
-  model = mobilenetv3_large()
+  model = mobilenetv3_small()
 
   print('the number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
-  device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-  # torch.cuda.set_device(device)
+  device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+  torch.cuda.set_device(device)
   print("Current device:", device)
   
   model.to(device)
@@ -117,45 +80,39 @@ def train(args):
     correct_val = 0
     correct_batch = 0
     # if epoch == 21:
-    if epoch == 13:
-      dataset_train = datasets.ImageFolder(root=args.aug_train_dir, transform=transform)
+    if epoch == 15:
+      print("Changing Dataloader")
+      # dataset_train = datasets.ImageFolderImageFolder(root=args.aug_train_dir, transform=transform)
+      dataset_train = Augmented_train(root=args.train_dir, bg_root=args.bg_dir,  transform=aug_transform, device=device)
       loader_train = DataLoader(dataset_train, batch_size=args.batchsize,
                                 shuffle=True, num_workers=8)
+      print(f"Begin Training..{time.time()-start}")
     for batch, (data, label) in enumerate(loader_train, 1):
-      # label = data['label'].to(device)
-      # input = data['input'].to(device)
       label = label.to(device)
       input = data.to(device)
 
       output = model(input)
-      # print(output.size())
       label_pred = soft(output).argmax(1)
   
       optim.zero_grad()
   
-      loss = criterion(output, label)
+      loss = criterion(output, label.long())
       loss.backward()
   
       optim.step()
   
       correct_train += (label == label_pred).float().sum()
 
-      # print(loss)
-      try:
-          train_loss += [loss.item()]
-      except RuntimeError :
-          print(f"{input.size()} raised CUDA illegal access" )
-      # train_loss.append(loss.item())
+      train_loss += [loss.item()]
 
     accuracy_train = correct_train / num_train
 
     correct_val = 0
     accuracy_tmp = np.array(0)
-    # if epoch+1 not in [43, 48, 53, 58, 63, 65]:
-    if epoch+1 not in [30, 35]:
+    if epoch+1 not in [38]:
       print(
-        "epoch: %04d / %04d | train loss: %.5f | train accuracy: %.4f " %
-        (epoch + 1, args.epochs, np.mean(train_loss), accuracy_train))
+        "epoch: %04d / %04d | train loss: %.5f | train accuracy: %.4f | time: %d" %
+        (epoch + 1, args.epochs, np.mean(train_loss), accuracy_train, time.time()-start))
       continue
     now = time.time()
     print(f"End of trainign: {now-start}")
@@ -164,32 +121,23 @@ def train(args):
 
       model.eval() 
       val_loss = []
-
-      conf = np.zeros((3,3))
-
+      torch.save(model.state_dict(), 'param.data')
       for batch, (data, label) in enumerate(loader_val, 1):
         label_val = label.to(device)
         input_val = data.to(device)
-        # label_val = data['label'].to(device)
-        # input_val = data['input'].to(device)
 
         output_val = model(input_val)
   
         label_val_pred = soft(output_val).argmax(1)
 
         correct_val += (label_val == label_val_pred).float().sum()
-        # print(output_val, label_val)
 
         loss = criterion(output_val, label_val.long())
         # val_loss += [loss.item()]
         val_loss.append(loss.item())
 
-        for i in range(len(label_val_pred)):
-          conf[int(label_val.cpu()[i]), int(label_val_pred.cpu()[i])] += 1
-
       accuracy_val = correct_val / num_val
 
-      print(conf)
       # Save the best model wrt val accuracy
       accuracy_tmp = accuracy_val.cpu().numpy()
       if accuracy_save < accuracy_tmp:
@@ -205,4 +153,3 @@ def train(args):
   print("Best epoch: ", best_epoch)
   print("Best validation accuracy: ", accuracy_save)
   print("Done.")
-    

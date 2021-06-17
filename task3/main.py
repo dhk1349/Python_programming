@@ -6,10 +6,11 @@ def parse_args():
 
   parser = argparse.ArgumentParser(description="SPDS_FinalPJT", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument("--batchsize", default=10, type=int, dest="batchsize")
-  parser.add_argument("--epochs", default=35, type=int, dest="epochs")
-  parser.add_argument("--train_dir", default="../rps/rps/", type=str, dest="train_dir")
-  parser.add_argument("--aug_train_dir", default="../rps/augmented_rps/", type=str, dest="aug_train_dir")
-  parser.add_argument("--val_dir", default="../validation/", type=str, dest="val_dir")
+  parser.add_argument("--epochs", default=38, type=int, dest="epochs")
+  parser.add_argument("--train_dir", default="../Data/rps", type=str, dest="train_dir")
+  # parser.add_argument("--aug_train_dir", default="../rps/augmented_rps/", type=str, dest="aug_train_dir")
+  parser.add_argument("--val_dir", default="../Data/validation/", type=str, dest="val_dir")
+  parser.add_argument("--bg_dir", default="../Data/random_bg/", type=str, dest="bg_dir")
   # parser.add_argument("--val_dir", default="../rps/rps-test-set/", type=str, dest="val_dir")
 
   return parser.parse_args()
