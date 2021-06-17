@@ -1,8 +1,9 @@
 import os
 import numpy as np
+import time
+
 import torch
 import torch.nn as nn
-
 from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
 
@@ -17,10 +18,10 @@ warnings.filterwarnings('ignore')
 
 
 def train(args):
-
-  num_train = len(os.listdir(os.path.join(args.train_dir, 'p/'))) + \
-          len(os.listdir(os.path.join(args.train_dir,'r/'))) + \
-          len(os.listdir(os.path.join(args.train_dir, 's')))
+  start = time.time()
+  num_train = len(os.listdir(os.path.join(args.train_dir, 'paper/'))) + \
+          len(os.listdir(os.path.join(args.train_dir,'rock/'))) + \
+          len(os.listdir(os.path.join(args.train_dir, 'scissors')))
   
   num_val = len(os.listdir(os.path.join(args.val_dir, 'p/'))) + \
           len(os.listdir(os.path.join(args.val_dir, 'r/'))) + \
@@ -28,9 +29,9 @@ def train(args):
 
   # transform = transforms.Compose([transforms.Resize((224, 224)), transforms.RandomHorizontalFlip(p=0.5)
   #                                 , transforms.RandomVerticalFlip(p=0.5), transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
-  transform = transforms.Compose([transforms.Resize((224, 224)), transforms.GaussianBlur(3),
+  transform = transforms.Compose([transforms.RandomCrop(224), transforms.GaussianBlur(3), #or use RandomResizedCrop(224)
                                   transforms.ColorJitter(brightness=(0.2, 2), contrast=(0.3, 2), saturation=(0.2, 2),
-                                                         hue=(-0.3, 0.3)), transforms.RandomRotation(360),
+                                                         hue=(-0.3, 0.3)), transforms.RandomRotation(90),
                                   transforms.ToTensor(),
                                   transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
   t2 = transforms.Compose([transforms.GaussianBlur(3), transforms.ColorJitter(brightness=(0.2, 2), contrast=(0.3, 2), saturation=(0.2, 2),
@@ -88,12 +89,12 @@ def train(args):
   soft = nn.Softmax(dim=1)
 
   # model = ResNet18()
-  model = mobilenetv3_small()
-  # model = mobilenetv3_large()
+  # model = mobilenetv3_small()
+  model = mobilenetv3_large()
 
   print('the number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
-  device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
-  torch.cuda.set_device(device)
+  device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+  # torch.cuda.set_device(device)
   print("Current device:", device)
   
   model.to(device)
@@ -103,7 +104,7 @@ def train(args):
   
   # Define the optimizer
   # optim = torch.optim.SGD(model.parameters(), lr = 0.001)
-  # optim = torch.optim.Adam(model.parameters(), lr = 0.01)
+  # optim = torch.optim.Adam(model.parameters(), lr = 0.03, weight_decay=0.00004)
   optim = torch.optim.SGD(model.parameters(), lr = 0.03,  momentum=0.09, weight_decay=0.00004)
 
   best_epoch = 0
@@ -115,7 +116,11 @@ def train(args):
     correct_train = 0
     correct_val = 0
     correct_batch = 0
-
+    # if epoch == 21:
+    if epoch == 13:
+      dataset_train = datasets.ImageFolder(root=args.aug_train_dir, transform=transform)
+      loader_train = DataLoader(dataset_train, batch_size=args.batchsize,
+                                shuffle=True, num_workers=8)
     for batch, (data, label) in enumerate(loader_train, 1):
       # label = data['label'].to(device)
       # input = data['input'].to(device)
@@ -143,14 +148,17 @@ def train(args):
       # train_loss.append(loss.item())
 
     accuracy_train = correct_train / num_train
-  
+
     correct_val = 0
     accuracy_tmp = np.array(0)
-    if epoch+1!=args.epochs:
+    # if epoch+1 not in [43, 48, 53, 58, 63, 65]:
+    if epoch+1 not in [30, 35]:
       print(
         "epoch: %04d / %04d | train loss: %.5f | train accuracy: %.4f " %
         (epoch + 1, args.epochs, np.mean(train_loss), accuracy_train))
       continue
+    now = time.time()
+    print(f"End of trainign: {now-start}")
     print("evaludating...")
     with torch.no_grad():
 
