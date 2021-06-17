@@ -1,0 +1,51 @@
+spds066
+the number of model parameters: 1520931
+Current device: cuda
+epoch: 0001 / 0040 | train loss: 1.08808 | train accuracy: 0.3679 | time: 13
+epoch: 0002 / 0040 | train loss: 1.05293 | train accuracy: 0.4440 | time: 22
+epoch: 0003 / 0040 | train loss: 1.00171 | train accuracy: 0.4698 | time: 31
+epoch: 0004 / 0040 | train loss: 0.93062 | train accuracy: 0.5329 | time: 40
+epoch: 0005 / 0040 | train loss: 0.85225 | train accuracy: 0.5952 | time: 49
+epoch: 0006 / 0040 | train loss: 0.68465 | train accuracy: 0.7004 | time: 60
+epoch: 0007 / 0040 | train loss: 0.55750 | train accuracy: 0.7639 | time: 69
+epoch: 0008 / 0040 | train loss: 0.46805 | train accuracy: 0.8198 | time: 77
+epoch: 0009 / 0040 | train loss: 0.41669 | train accuracy: 0.8321 | time: 86
+epoch: 0010 / 0040 | train loss: 0.32230 | train accuracy: 0.8722 | time: 95
+epoch: 0011 / 0040 | train loss: 0.30324 | train accuracy: 0.8833 | time: 104
+epoch: 0012 / 0040 | train loss: 0.27438 | train accuracy: 0.8933 | time: 112
+epoch: 0013 / 0040 | train loss: 0.24431 | train accuracy: 0.9123 | time: 121
+epoch: 0014 / 0040 | train loss: 0.23177 | train accuracy: 0.9111 | time: 133
+epoch: 0015 / 0040 | train loss: 0.20386 | train accuracy: 0.9242 | time: 141
+epoch: 0016 / 0040 | train loss: 0.74739 | train accuracy: 0.6873 | time: 150
+epoch: 0017 / 0040 | train loss: 0.61826 | train accuracy: 0.7345 | time: 159
+epoch: 0018 / 0040 | train loss: 0.54368 | train accuracy: 0.7730 | time: 168
+epoch: 0019 / 0040 | train loss: 0.48552 | train accuracy: 0.8048 | time: 178
+epoch: 0020 / 0040 | train loss: 0.47454 | train accuracy: 0.7996 | time: 190
+epoch: 0021 / 0040 | train loss: 0.46054 | train accuracy: 0.8167 | time: 199
+epoch: 0022 / 0040 | train loss: 0.39145 | train accuracy: 0.8496 | time: 209
+epoch: 0023 / 0040 | train loss: 0.39495 | train accuracy: 0.8532 | time: 219
+epoch: 0024 / 0040 | train loss: 0.33933 | train accuracy: 0.8623 | time: 229
+epoch: 0025 / 0040 | train loss: 0.31844 | train accuracy: 0.8833 | time: 240
+epoch: 0026 / 0040 | train loss: 0.31291 | train accuracy: 0.8806 | time: 249
+epoch: 0027 / 0040 | train loss: 0.27104 | train accuracy: 0.8956 | time: 259
+epoch: 0028 / 0040 | train loss: 0.27212 | train accuracy: 0.8992 | time: 270
+epoch: 0029 / 0040 | train loss: 0.24946 | train accuracy: 0.9036 | time: 282
+epoch: 0030 / 0040 | train loss: 0.24494 | train accuracy: 0.9155 | time: 293
+epoch: 0031 / 0040 | train loss: 0.23705 | train accuracy: 0.9155 | time: 303
+epoch: 0032 / 0040 | train loss: 0.21647 | train accuracy: 0.9163 | time: 313
+epoch: 0033 / 0040 | train loss: 0.19602 | train accuracy: 0.9274 | time: 323
+epoch: 0034 / 0040 | train loss: 0.19562 | train accuracy: 0.9274 | time: 333
+epoch: 0035 / 0040 | train loss: 0.16526 | train accuracy: 0.9405 | time: 344
+epoch: 0036 / 0040 | train loss: 0.18404 | train accuracy: 0.9381 | time: 354
+epoch: 0037 / 0040 | train loss: 0.18394 | train accuracy: 0.9333 | time: 364
+End of trainign: 378.2076437473297
+evaludating...
+.......model updated (epoch =  38 )
+epoch: 0038 / 0040 | train loss: 0.15570 | train accuracy: 0.9460 | validation loss: 1.16105 | validation accuracy: 0.5450
+epoch: 0039 / 0040 | train loss: 0.13441 | train accuracy: 0.9496 | time: 597
+epoch: 0040 / 0040 | train loss: 0.16838 | train accuracy: 0.9381 | time: 611
+Model with the best validation accuracy is saved.
+Best epoch:  37
+Best validation accuracy:  0.5449915
+Done.
+Training time: 611.5445687770844
